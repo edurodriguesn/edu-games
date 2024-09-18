@@ -109,7 +109,7 @@ function isAuthenticated(req, res, next) {
 app.get('/admin', isAuthenticated, (req, res) => {
     const sortField = req.query.sort === 'data_modificacao' ? 'data_modificacao' : 'data_criacao'; // Ordenar por data de criação como padrão
 
-    const query = `SELECT nome, data_criacao, data_modificacao FROM conteudo ORDER BY ${sortField} DESC`;
+    const query = `SELECT id, nome, data_criacao, data_modificacao FROM conteudo ORDER BY ${sortField} DESC`;
 
     db.all(query, (err, conteudos) => {
         if (err) {
@@ -124,46 +124,47 @@ app.get('/admin', isAuthenticated, (req, res) => {
 app.post('/admin/conteudos/:id/delete', isAuthenticated, (req, res) => {
     const { id } = req.params;
 
-    // Adicione um log para verificar o ID
-    console.log('ID recebido para exclusão:', id);
-
-    if (!id) {
-        return res.status(400).send('ID não fornecido');
-    }
-
     db.get("SELECT * FROM conteudo WHERE id = ?", [id], (err, conteudo) => {
         if (err) {
             return res.status(500).send('Erro ao carregar o conteúdo');
         }
 
+        // Verificar se o conteúdo foi encontrado
         if (!conteudo) {
             return res.status(404).send('Conteúdo não encontrado');
         }
 
-        // Excluir imagens e diretório
-        const slug = conteudo.slug;
-        const imagens = JSON.parse(conteudo.imagens);
+        // Excluir imagens do sistema de arquivos usando o slug do nome
+        const slug = conteudo.slug; // Assumindo que o slug é um campo da tabela 'conteudo'
+        const imagens = JSON.parse(conteudo.imagens); // Assumindo que as imagens são armazenadas como JSON
 
+        // Excluir cada imagem dentro do diretório
         imagens.forEach(imagem => {
             const imagePath = path.join(__dirname, 'public/uploads', slug, imagem);
             if (fs.existsSync(imagePath)) {
-                fs.unlinkSync(imagePath);
+                fs.unlinkSync(imagePath); // Excluir a imagem
             }
         });
 
+        // Remover o diretório do slug de forma recursiva (inclui arquivos)
         const slugDir = path.join(__dirname, 'public/uploads', slug);
         if (fs.existsSync(slugDir)) {
-            fs.rmdirSync(slugDir);
+            // Use fs.rmSync para exclusão recursiva
+            fs.rmSync(slugDir, { recursive: true, force: true }); // Exclui o diretório mesmo se não estiver vazio
         }
 
+        // Excluir o conteúdo do banco de dados
         db.run("DELETE FROM conteudo WHERE id = ?", [id], (err) => {
             if (err) {
                 return res.status(500).send('Erro ao excluir o conteúdo');
             }
+
+            // Redirecionar para a página de administração
             res.redirect('/admin');
         });
     });
 });
+
 
 
 
@@ -266,7 +267,7 @@ app.post('/add-content', upload.array('imagens'), (req, res) => {
         const slug = slugify(nome, { lower: true });
 
         // Criar pasta com o nome do conteúdo em slug dentro da pasta 'uploads'
-        const contentDir = path.join(__dirname, 'uploads', slug);
+        const contentDir = path.join(__dirname, 'public','uploads', slug);
         if (!fs.existsSync(contentDir)) {
             fs.mkdirSync(contentDir, { recursive: true });
         }
