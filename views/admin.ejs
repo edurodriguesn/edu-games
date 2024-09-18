@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administração</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-4">
+    <h1 class="text-2xl font-bold mb-4">Administração de Conteúdos</h1>
+    <a href="/admin/conteudos/new" class="bg-blue-500 text-white rounded p-2 mb-4 inline-block">Adicionar Conteúdo</a>
+
+    <h2 class="text-xl font-bold mb-4">Conteúdos Cadastrados</h2>
+
+    <!-- Filtro de ordenação -->
+    <form action="/admin/conteudos" method="GET" class="mb-4">
+        <label for="sort" class="mr-2">Ordenar por:</label>
+        <select name="sort" id="sort" class="border rounded p-2">
+            <option value="data_criacao" <% if (sort === 'data_criacao') { %> selected <% } %>>Data de Criação</option>
+            <option value="data_modificacao" <% if (sort === 'data_modificacao') { %> selected <% } %>>Data de Modificação</option>
+        </select>
+        <button type="submit" class="bg-blue-500 text-white rounded p-2 ml-2">Ordenar</button>
+    </form>
+
+    <table class="w-full bg-white shadow-md rounded mb-4">
+        <thead>
+            <tr>
+                <th class="border p-2">Nome</th>
+                <th class="border p-2">Data de Criação</th>
+                <th class="border p-2">Data de Modificação</th>
+                <th class="border p-2">Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% conteudos.forEach(conteudo => { %>
+                <tr>
+                    <td class="border p-2"><%= conteudo.nome %></td>
+                    <td class="border p-2"><%= new Date(conteudo.data_criacao).toLocaleString() %></td>
+                    <td class="border p-2"><%= new Date(conteudo.data_modificacao).toLocaleString() %></td>
+                    <td class="border p-2">
+                        <a href="/admin/conteudos/<%= conteudo.id %>/edit" class="bg-yellow-500 text-white rounded p-2">Editar</a>
+                        <form action="/admin/conteudos/<%= conteudo.id %>/delete" method="POST" class="inline">
+                            <button type="submit" class="bg-red-500 text-white rounded p-2">Excluir</button>
+                        </form>
+                    </td>
+                </tr>
+            <% }) %>
+            
+                      
+        </tbody>
+    </table>
+</body>
+</html>

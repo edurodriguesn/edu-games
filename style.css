@@ -1,0 +1,28 @@
+*{
+    padding: 0px;
+    border: 0px;
+    margin: 0px;
+}
+a{
+    color: #ffffff;
+    text-decoration: none;
+}
+#cabecalho{
+    background: #082444;
+    color: white;
+    padding: 10px 5%;
+    display: flex;
+    justify-content:space-between;
+}
+#assinatura{
+    
+}
+#menu > ul{
+    list-style-type: none; /* Remove os marcadores da lista */
+    padding: 0px 10px 0px 10px;
+    display: flex; /* Exibe os itens em linha usando flexbox */
+}
+
+body > div{
+    border: 1px solid red;
+}
