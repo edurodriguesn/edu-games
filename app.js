@@ -149,8 +149,13 @@ app.post('/admin/conteudos/:id/delete', isAuthenticated, (req, res) => {
         // Remover o diretório do slug de forma recursiva (inclui arquivos)
         const slugDir = path.join(__dirname, 'public/uploads', slug);
         if (fs.existsSync(slugDir)) {
-            // Use fs.rmSync para exclusão recursiva
             fs.rmSync(slugDir, { recursive: true, force: true }); // Exclui o diretório mesmo se não estiver vazio
+        }
+
+        // Excluir o arquivo HTML correspondente
+        const htmlFilePath = path.join(__dirname, 'public/jogos', `${slug}.html`);
+        if (fs.existsSync(htmlFilePath)) {
+            fs.unlinkSync(htmlFilePath); // Excluir o arquivo HTML
         }
 
         // Excluir o conteúdo do banco de dados
@@ -164,6 +169,7 @@ app.post('/admin/conteudos/:id/delete', isAuthenticated, (req, res) => {
         });
     });
 });
+
 
 
 
@@ -251,70 +257,115 @@ app.post('/add-option', (req, res) => {
             return res.status(400).json({ success: false, message: 'Tipo inválido' });
     }
 
-    db.run(`INSERT INTO ${tableName} (nome) VALUES (?)`, [nome], (err) => {
+    // Verifica se a opção já existe antes de adicionar
+    db.get(`SELECT * FROM ${tableName} WHERE nome = ?`, [nome], (err, row) => {
         if (err) {
-            return res.status(500).json({ success: false, message: 'Erro ao adicionar a nova opção' });
+            return res.status(500).json({ success: false, message: 'Erro ao verificar a opção existente' });
         }
-        res.status(200).json({ success: true, message: 'Opção adicionada com sucesso' });
+
+        if (row) {
+            return res.status(400).json({ success: false, message: 'A opção já existe' });
+        }
+
+        // Adiciona a nova opção se não existir
+        db.run(`INSERT INTO ${tableName} (nome) VALUES (?)`, [nome], (err) => {
+            if (err) {
+                return res.status(500).json({ success: false, message: 'Erro ao adicionar a nova opção' });
+            }
+            res.status(200).json({ success: true, message: 'Opção adicionada com sucesso' });
+        });
     });
 });
 
+
+
 // Rota para adicionar conteúdo
+// Adicionar novo conteúdo
 app.post('/add-content', upload.array('imagens'), (req, res) => {
     try {
         const { nome, ano, plataforma, categoria, desenvolvedor, descricao, linkTitle, linkURL } = req.body;
-        const linksExternos = Array.isArray(linkTitle) ? linkTitle.map((titulo, index) => ({ title: titulo, url: linkURL[index] })) : [{ title: linkTitle, url: linkURL }];
+
+        // Verifica se as plataformas, categorias e desenvolvedores são arrays ou strings únicas
+        const plataformas = Array.isArray(plataforma) ? plataforma : [plataforma].filter(Boolean);
+        const categorias = Array.isArray(categoria) ? categoria : [categoria].filter(Boolean);
+        const desenvolvedores = Array.isArray(desenvolvedor) ? desenvolvedor : [desenvolvedor].filter(Boolean);
+        
+        // Links externos
+        const linksExternos = Array.isArray(linkTitle) && Array.isArray(linkURL) 
+            ? linkTitle.map((titulo, index) => ({ title: titulo, url: linkURL[index] })) 
+            : linkTitle && linkURL 
+                ? [{ title: linkTitle, url: linkURL }] 
+                : [];
+        
         const slug = slugify(nome, { lower: true });
 
-        // Criar pasta com o nome do conteúdo em slug dentro da pasta 'uploads'
-        const contentDir = path.join(__dirname, 'public','uploads', slug);
+        // Criar pasta para as imagens do conteúdo
+        const contentDir = path.join(__dirname, 'public', 'uploads', slug);
         if (!fs.existsSync(contentDir)) {
             fs.mkdirSync(contentDir, { recursive: true });
         }
 
-        // Mover imagens para a pasta criada
-        const imagens = req.files.map(file => {
-            const newFilePath = path.join(contentDir, file.originalname);
+        // Mover as imagens para a pasta do conteúdo e renomeá-las
+        // Mover as imagens para a pasta do conteúdo e renomeá-las
+        const imagens = req.files.map((file, index) => {
+            const newFileName = `imagem-${index + 1}${path.extname(file.originalname)}`; // Renomeia como imagem-1, imagem-2, etc.
+            const newFilePath = path.join(contentDir, newFileName);
             fs.renameSync(file.path, newFilePath);
-            return path.relative(__dirname, newFilePath);
+            return newFileName; // Armazena apenas o novo nome
         });
+
 
         // Dados do conteúdo
         const conteudo = {
             id: this.lastID,
             titulo: nome,
             ano,
-            plataforma,
-            categoria,
-            desenvolvedor,
+            plataformas,
+            categorias,
+            desenvolvedores,
             descricao,
             links: linksExternos,
-            imagens
+            imagens,
+            slug
         };
 
         // Gerar a página HTML usando o template.ejs
         const templatePath = path.join(__dirname, 'views', 'template.ejs');
-        const htmlContent = ejs.render(fs.readFileSync(templatePath, 'utf-8'), { conteudo });
-
+        const htmlContent = ejs.render(fs.readFileSync(templatePath, 'utf-8'), { 
+            conteudo, 
+            path: require('path') // Adicione esta linha
+        });
+        
         // Salvar a página HTML na pasta do conteúdo
         const htmlFilePath = path.join(__dirname, 'public', 'jogos', `${slug}.html`);
         fs.writeFileSync(htmlFilePath, htmlContent);
 
-
         // Obter a data e hora atual para data_criacao e data_modificacao
         const dataAtual = new Date().toISOString();
 
-        // Salvar as informações no banco de dados com a data de criação e modificação
+        // Salvar as informações no banco de dados
         db.run(
             `INSERT INTO conteudo (nome, ano, plataforma, categoria, desenvolvedores, descricao, links, imagens, slug, data_criacao, data_modificacao) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, 
-            [nome, ano, plataforma, categoria, desenvolvedor, descricao, JSON.stringify(linksExternos), JSON.stringify(imagens), slug, dataAtual, dataAtual], 
+            [
+                nome, 
+                ano, 
+                JSON.stringify(plataformas), 
+                JSON.stringify(categorias), 
+                JSON.stringify(desenvolvedores), 
+                descricao, 
+                JSON.stringify(linksExternos), 
+                JSON.stringify(imagens), 
+                slug, 
+                dataAtual, 
+                dataAtual
+            ], 
             (err) => {
                 if (err) {
                     console.error(err);
                     return res.status(500).json({ success: false, message: 'Erro ao salvar o conteúdo no banco de dados' });
                 }
-                res.status(200).json({ success: true, message: 'Conteúdo adicionado com sucesso'});
+                res.redirect('/admin'); // Redirecionar para a página de administração
             }
         );
     } catch (error) {
@@ -322,6 +373,11 @@ app.post('/add-content', upload.array('imagens'), (req, res) => {
         res.status(500).json({ success: false, message: 'Erro ao adicionar o conteúdo' });
     }
 });
+
+
+
+// Adicionar uma nova característica (plataforma, categoria ou desenvolvedor)
+
 
 
 // Inicialização do servidor

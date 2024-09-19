@@ -6,6 +6,78 @@
     <title>Adicionar Conteúdo</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
+        
+        function addOptionField(selectId, containerId, placeholder) {
+            const select = document.getElementById(selectId);
+            const container = document.getElementById(containerId);
+            const selectedValue = select.options[select.selectedIndex].value;
+
+            if (!selectedValue || Array.from(container.children).some(el => el.children[0].value === selectedValue)) {
+                alert('Característica já adicionada ou não selecionada.');
+                return;
+            }
+
+            const newField = document.createElement('div');
+            newField.className = 'flex items-center mt-2';
+
+            const newInput = document.createElement('input');
+            newInput.type = 'text';
+            newInput.name = selectId;
+            newInput.value = selectedValue;
+            newInput.className = 'border rounded p-2 w-full';
+            newInput.readOnly = true;
+
+            const removeButton = document.createElement('button');
+            removeButton.type = 'button';
+            removeButton.className = 'bg-red-500 text-white p-2 rounded ml-2';
+            removeButton.innerText = 'Remover';
+            removeButton.onclick = () => container.removeChild(newField);
+
+            newField.appendChild(newInput);
+            newField.appendChild(removeButton);
+            container.appendChild(newField);
+        }
+
+        function addNewOption(selectId, inputId, containerId) {
+            const input = document.getElementById(inputId);
+            const newValue = input.value.trim();
+
+            if (!newValue) {
+                alert('Digite uma nova característica válida.');
+                return;
+            }
+
+            // Verifica duplicatas no select
+            const select = document.getElementById(selectId);
+            if (Array.from(select.options).some(option => option.value === newValue)) {
+                alert('Essa característica já está disponível nas opções.');
+                return;
+            }
+
+            // Cria nova opção e envia ao servidor
+            fetch('/add-option', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `tipo=${selectId}&nome=${newValue}`
+            }).then(response => {
+                if (!response.ok) {
+                    alert('Erro ao adicionar a nova característica.');
+                    return;
+                }
+
+                // Adiciona a nova opção no select
+                const newOption = document.createElement('option');
+                newOption.value = newValue;
+                newOption.text = newValue;
+                select.add(newOption);
+
+                // Limpa o campo de texto
+                input.value = '';
+                alert('Nova característica adicionada com sucesso.');
+            });
+        }
         function addTextField() {
             const container = document.getElementById('dynamic-fields');
             const newTextField = document.createElement('textarea');
@@ -61,76 +133,70 @@
             container.appendChild(linkContainer);
         }
 
-        function addOption(selectId, inputId) {
-            const select = document.getElementById(selectId);
-            const input = document.getElementById(inputId);
-            const newOption = document.createElement('option');
-            newOption.value = input.value;
-            newOption.text = input.value;
-            select.add(newOption);
-            input.value = '';
-
-            // Enviar a nova opção para o servidor
-            fetch('/add-option', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: `tipo=${selectId}&nome=${newOption.value}`
-            }).then(response => {
-                if (!response.ok) {
-                    alert('Erro ao adicionar a nova opção');
-                }
-            });
-        }
     </script>
 </head>
 <body class="p-4">
     <h1 class="text-2xl font-bold mb-4">Adicionar Conteúdo</h1>
     <form action="/add-content" method="POST" enctype="multipart/form-data">
-    </div>
-    <div class="mb-4">
-        <label for="nome" class="block text-sm font-medium text-gray-700">Nome do Conteúdo</label>
-        <input type="text" id="nome" name="nome" class="border rounded p-2 w-full" required>
-    </div>    
-    <div class="mb-4">
-        <label for="ano" class="block text-sm font-medium text-gray-700">Ano de Lançamento</label>
-        <input type="number" id="ano" name="ano" class="border rounded p-2 w-full" required>
-    </div>
-    <div class="mb-4">
-        <label for="plataforma" class="block text-sm font-medium text-gray-700">Plataforma</label>
-        <select id="plataforma" name="plataforma" class="border rounded p-2 w-full" required>
-            <% plataformas.forEach(plataforma => { %>
-                <option value="<%= plataforma.nome %>"><%= plataforma.nome %></option>
-            <% }) %>
-        </select>
-        <input type="text" id="newPlataforma" class="border rounded p-2 w-full mt-2" placeholder="Nova Plataforma">
-        <button type="button" onclick="addOption('plataforma', 'newPlataforma')" class="bg-blue-500 text-white p-2 rounded mt-2">Adicionar Plataforma</button>
-    </div>
-    <div class="mb-4">
-        <label for="categoria" class="block text-sm font-medium text-gray-700">Categoria</label>
-        <select id="categoria" name="categoria" class="border rounded p-2 w-full" required>
-            <% categorias.forEach(categoria => { %>
-                <option value="<%= categoria.nome %>"><%= categoria.nome %></option>
-            <% }) %>
-        </select>
-        <input type="text" id="newCategoria" class="border rounded p-2 w-full mt-2" placeholder="Nova Categoria">
-        <button type="button" onclick="addOption('categoria', 'newCategoria')" class="bg-blue-500 text-white p-2 rounded mt-2">Adicionar Categoria</button>
-    </div>
+        <div class="mb-4">
+            <label for="nome" class="block text-sm font-medium text-gray-700">Nome do Conteúdo</label>
+            <input type="text" id="nome" name="nome" class="border rounded p-2 w-full" required>
+        </div>
+        <div class="mb-4">
+            <label for="ano" class="block text-sm font-medium text-gray-700">Ano de Lançamento</label>
+            <input type="number" id="ano" name="ano" class="border rounded p-2 w-full" required>
+        </div>
+
+        <!-- Plataforma -->
+<div class="mb-4">
+    <label for="plataforma" class="block text-sm font-medium text-gray-700">Plataforma</label>
+    <select id="plataforma" class="border rounded p-2 w-full">
+        <option value="">Selecione uma Plataforma</option>
+        <% plataformas.forEach(plataforma => { %>
+            <option value="<%= plataforma.nome %>"><%= plataforma.nome %></option>
+        <% }) %>
+    </select>
+    <button type="button" onclick="addOptionField('plataforma', 'plataformas-container')" class="bg-blue-500 text-white p-2 rounded mt-2">Adicionar Plataforma</button>
+    <input type="text" id="newPlataforma" class="border rounded p-2 w-full mt-2" placeholder="Nova Plataforma">
+    <button type="button" onclick="addNewOption('plataforma', 'newPlataforma', 'plataformas-container')" class="bg-green-500 text-white p-2 rounded mt-2">Criar Nova Plataforma</button>
+    <div id="plataformas-container" class="mt-2"></div>
+</div>
+
+<!-- Categoria -->
+<div class="mb-4">
+    <label for="categoria" class="block text-sm font-medium text-gray-700">Categoria</label>
+    <select id="categoria" class="border rounded p-2 w-full">
+        <option value="">Selecione uma Categoria</option>
+        <% categorias.forEach(categoria => { %>
+            <option value="<%= categoria.nome %>"><%= categoria.nome %></option>
+        <% }) %>
+    </select>
+    <button type="button" onclick="addOptionField('categoria', 'categorias-container')" class="bg-blue-500 text-white p-2 rounded mt-2">Adicionar Categoria</button>
+    <input type="text" id="newCategoria" class="border rounded p-2 w-full mt-2" placeholder="Nova Categoria">
+    <button type="button" onclick="addNewOption('categoria', 'newCategoria', 'categorias-container')" class="bg-green-500 text-white p-2 rounded mt-2">Criar Nova Categoria</button>
+    <div id="categorias-container" class="mt-2"></div>
+</div>
+
+<!-- Desenvolvedor -->
 <div class="mb-4">
     <label for="desenvolvedor" class="block text-sm font-medium text-gray-700">Desenvolvedor</label>
-    <select id="desenvolvedor" name="desenvolvedor" class="border rounded p-2 w-full" required>
+    <select id="desenvolvedor" class="border rounded p-2 w-full">
+        <option value="">Selecione um Desenvolvedor</option>
         <% desenvolvedores.forEach(desenvolvedor => { %>
             <option value="<%= desenvolvedor.nome %>"><%= desenvolvedor.nome %></option>
         <% }) %>
     </select>
+    <button type="button" onclick="addOptionField('desenvolvedor', 'desenvolvedores-container')" class="bg-blue-500 text-white p-2 rounded mt-2">Adicionar Desenvolvedor</button>
     <input type="text" id="newDesenvolvedor" class="border rounded p-2 w-full mt-2" placeholder="Novo Desenvolvedor">
-    <button type="button" onclick="addOption('desenvolvedor', 'newDesenvolvedor')" class="bg-blue-500 text-white p-2 rounded mt-2">Adicionar Desenvolvedor</button>
+    <button type="button" onclick="addNewOption('desenvolvedor', 'newDesenvolvedor', 'desenvolvedores-container')" class="bg-green-500 text-white p-2 rounded mt-2">Criar Novo Desenvolvedor</button>
+    <div id="desenvolvedores-container" class="mt-2"></div>
 </div>
+
         <div class="mb-4">
-            <label for="descricao" class="block text-sm font-medium text-gray-700">Descrição do (título do conteúdo)</label>
+            <label for="descricao" class="block text-sm font-medium text-gray-700">Descrição</label>
             <textarea id="descricao" name="descricao" class="border rounded p-2 w-full" required></textarea>
         </div>
+        
         <div id="dynamic-fields" class="mb-4"></div>
         <button type="button" onclick="addLinkField()" class="bg-blue-500 text-white p-2 rounded">Adicionar Link Externo</button>
         <button type="button" onclick="addImageField()" class="bg-blue-500 text-white p-2 rounded">Adicionar Imagem</button>
