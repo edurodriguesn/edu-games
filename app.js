@@ -73,7 +73,21 @@ app.get('/', (req, res) => {
         }
         res.render('index', { conteudos: rows }); //carrega o template 'index' e envia a coluna conteúdos para o template
     });
+    
 });
+app.get('/check-image', (req, res) => {
+    const { slug, imageName } = req.query;
+    const filePath = path.join(__dirname, 'public', 'uploads', slug, imageName);
+
+    fs.access(filePath, fs.constants.F_OK, (err) => {
+        if (err) {
+            res.status(404).send('Not Found');
+        } else {
+            res.status(200).send('Exists');
+        }
+    });
+});
+
 
 /*==============================/
     PROCESSAMENTO DE LOGIN (OK!)
@@ -101,11 +115,10 @@ function isAuthenticated(req, res, next) {
     }
 }
 
-/*=============================
+/*==========g===================
     ADMINISTRAÇÃO DE CONTEÚDO
   =============================*/
 // Rota para renderizar a página de admin: OK!
-// Rota para carregar conteúdos e permitir ordenação por data de criação ou modificação
 app.get('/admin', isAuthenticated, (req, res) => {
     const sortField = req.query.sort === 'data_modificacao' ? 'data_modificacao' : 'data_criacao'; // Ordenar por data de criação como padrão
 
