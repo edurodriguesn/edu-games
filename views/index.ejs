@@ -19,19 +19,20 @@
 <body class="bg-gray-100">
 
     <header class="bg-blue-900 text-white p-4 text-center ">
-        <h1 class="text-2xl font-semibold"><a href="/" class="hover:underline">Games Hub</a> - Central de Jogos sobre Computação</h1>
+        <h1 class="text-2xl font-semibold"><a href="" class="hover:underline">Games Hub</a> - Central de Jogos sobre Computação</h1>
     </header>
     <div class="bg-white w-4/5 mx-auto shadow-lg my-6 rounded-lg overflow-hidden">
         <div class="flex flex-col items-center p-4 w-3/4 mx-auto space-y-4">
-            <div> <a href="/" class="hover:underline"><img src="imagens/logo.png" alt="logo" class="w-48"></a>  </div> <!-- Logo -->
+            <div> <a href="" class="hover:underline"><img src="imagens/logo.png" alt="logo" class="w-48"></a>  </div> <!-- Logo -->
         
-            <div class="w-1/2"> <!-- Campo de Pesquisa -->
-                <form action="/pesquisa" method="GET">
+            <div class="w-1/2">
+                <form action="/pesquisa" method="GET" class="flex">
                     <input type="text" id="pesquisa" name="pesquisa" placeholder="Pesquisar"
-                        class="bg-gray-200 text-gray-700 mt-1 block w-full rounded-md shadow-sm p-2">
+                        class="bg-gray-200 text-gray-700 block w-full rounded-md shadow-sm p-2">
+                    <button class="btn bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-2">Buscar</button>
                 </form>
             </div>
-        
+            
             <div class="flex space-x-4 items-center"> <!-- Campo de Filtro -->
                 <div class="bg-gray-200 text-gray-700 py-2 px-4 rounded">
                     Filtrar por...
@@ -85,11 +86,11 @@
             <section class="p-4 text-center"> <!-- Galeria de Jogos -->
                 <h1 class="text-2xl font-bold mb-4">Galeria de Jogos</h1>
                 <div class="grid grid-cols-3 gap-4">
-                    <% conteudos.forEach(function(conteudo) { %>
+                    <% jogos.forEach(function(jogo) { %>
                     <div class="game-card max-w-xs bg-white shadow-lg rounded-lg overflow-hidden relative">
-                        <a href="/jogos/<%= conteudo.slug %>.html">
+                        <a href="/jogos/<%= jogo.slug %>.html">
                             <div class="relative group game-card">
-                                <img class="w-full h-48 object-cover" src="/uploads/<%= conteudo.slug %>/imagem-1.jpg" alt="<%= conteudo.titulo %>"> <!-- Primeira Imagem -->
+                                <img class="w-full h-48 object-cover" src="/uploads/<%= jogo.slug %>/imagem-1.jpg" alt="<%= jogo.titulo %>"> <!-- Primeira Imagem -->
                             </div>
                             
                             <script>
@@ -98,7 +99,7 @@
                             
                                     cards.forEach(card => {
                                         let imageIndex = 1; // Começa a partir da imagem-1
-                                        const slug = '<%= conteudo.slug %>';
+                                        const slug = '<%= jogo.slug %>';
                                         const baseUrl = '/uploads/' + slug + '/imagem-';
                                         const fileExtension = '.jpg';
                                         let interval;
@@ -135,7 +136,7 @@
                             </script>
                                                                             
                             <div class="p-4">
-                                <h2 class="text-lg font-bold"><%= conteudo.nome %></h2>
+                                <h2 class="text-lg font-bold"><%= jogo.nome %></h2>
                             </div>
                         </a>
                         
@@ -150,8 +151,8 @@
         <div class="w-3/4 mx-auto">
             <div class="flex justify-between items-center flex-col md:flex-row space-y-4 md:space-y-0">
                 <div class="flex items-center space-x-4">
-                    <div><a href="/" class="hover:underline"><img src="imagens/logo.png" alt="logo" class="w-32"></a></div>
-                    <div><p>&copy; 2024 <a href="/" class="hover:underline">Games Hub</a>. Todos os direitos reservados.</p></div>
+                    <div><a href="" class="hover:underline"><img src="imagens/logo.png" alt="logo" class="w-32"></a></div>
+                    <div><p>&copy; 2024 <a href="" class="hover:underline">Games Hub</a>. Todos os direitos reservados.</p></div>
                     
                 </div>
     

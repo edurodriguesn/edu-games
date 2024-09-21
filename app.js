@@ -32,7 +32,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Criar tabelas se não existirem: OK!
 db.serialize(() => {
-    db.run(`CREATE TABLE IF NOT EXISTS conteudo (
+    db.run(`CREATE TABLE IF NOT EXISTS jogo (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         nome TEXT NOT NULL,
         ano INTEGER,
@@ -67,11 +67,11 @@ db.serialize(() => {
 
 //renderizar pagina inicial: OK!
 app.get('/', (req, res) => {
-    db.all("SELECT * FROM conteudo", [], (err, rows) => {
+    db.all("SELECT * FROM jogo", [], (err, rows) => {
         if (err) {
             throw err;
         }
-        res.render('index', { conteudos: rows }); //carrega o template 'index' e envia a coluna conteúdos para o template
+        res.render('index', { jogos: rows }); //carrega o template 'index' e envia a coluna conteúdos para o template
     });
     
 });
@@ -124,34 +124,34 @@ function isAuthenticated(req, res, next) {
 app.get('/admin', isAuthenticated, (req, res) => {
     const sortField = req.query.sort === 'data_modificacao' ? 'data_modificacao' : 'data_criacao'; // Ordenar por data de criação como padrão
 
-    const query = `SELECT id, nome, data_criacao, data_modificacao FROM conteudo ORDER BY ${sortField} DESC`;
+    const query = `SELECT id, nome, data_criacao, data_modificacao FROM jogo ORDER BY ${sortField} DESC`;
 
-    db.all(query, (err, conteudos) => {
+    db.all(query, (err, jogos) => {
         if (err) {
             return res.status(500).send('Erro ao carregar os conteúdos');
         }
 
-        res.render('admin', { conteudos, sort: sortField });
+        res.render('admin', { jogos, sort: sortField });
     });
 });
 
 // Rota para excluir um conteúdo
-app.post('/admin/conteudos/:id/delete', isAuthenticated, (req, res) => {
+app.post('/admin/jogos/:id/delete', isAuthenticated, (req, res) => {
     const { id } = req.params;
 
-    db.get("SELECT * FROM conteudo WHERE id = ?", [id], (err, conteudo) => {
+    db.get("SELECT * FROM jogo WHERE id = ?", [id], (err, jogo) => {
         if (err) {
             return res.status(500).send('Erro ao carregar o conteúdo');
         }
 
         // Verificar se o conteúdo foi encontrado
-        if (!conteudo) {
+        if (!jogo) {
             return res.status(404).send('Conteúdo não encontrado');
         }
 
         // Excluir imagens do sistema de arquivos usando o slug do nome
-        const slug = conteudo.slug; // Assumindo que o slug é um campo da tabela 'conteudo'
-        const imagens = JSON.parse(conteudo.imagens); // Assumindo que as imagens são armazenadas como JSON
+        const slug = jogo.slug; // Assumindo que o slug é um campo da tabela 'jogo'
+        const imagens = JSON.parse(jogo.imagens); // Assumindo que as imagens são armazenadas como JSON
 
         // Excluir cada imagem dentro do diretório
         imagens.forEach(imagem => {
@@ -174,7 +174,7 @@ app.post('/admin/conteudos/:id/delete', isAuthenticated, (req, res) => {
         }
 
         // Excluir o conteúdo do banco de dados
-        db.run("DELETE FROM conteudo WHERE id = ?", [id], (err) => {
+        db.run("DELETE FROM jogo WHERE id = ?", [id], (err) => {
             if (err) {
                 return res.status(500).send('Erro ao excluir o conteúdo');
             }
@@ -191,7 +191,7 @@ app.post('/admin/conteudos/:id/delete', isAuthenticated, (req, res) => {
        ADIÇÃO DE CONTEÚDO
   ============================*/
 // Rota para renderizar a página de criação de novo conteúdo: OK!
-app.get('/admin/conteudos/new', isAuthenticated, (req, res) => {
+app.get('/admin/jogos/adicionar', isAuthenticated, (req, res) => {
     db.all("SELECT nome FROM plataforma", (err, plataformas) => {
         if (err) {
             return res.status(500).send('Erro ao carregar as plataformas');
@@ -204,7 +204,7 @@ app.get('/admin/conteudos/new', isAuthenticated, (req, res) => {
                 if (err) {
                     return res.status(500).send('Erro ao carregar os desenvolvedores');
                 }
-                res.render('novo-jogo', { plataformas, categorias, desenvolvedores });
+                res.render('adicionar-jogo', { plataformas, categorias, desenvolvedores });
             });
         });
     });
@@ -287,7 +287,7 @@ app.post('/add-content', upload.array('imagens'), (req, res) => {
 
 
         // Dados do conteúdo
-        const conteudo = {
+        const jogo = {
             id: this.lastID,
             titulo: nome,
             ano,
@@ -303,7 +303,7 @@ app.post('/add-content', upload.array('imagens'), (req, res) => {
         // Gerar a página HTML usando o template.ejs
         const templatePath = path.join(__dirname, 'views', 'template.ejs');
         const htmlContent = ejs.render(fs.readFileSync(templatePath, 'utf-8'), { 
-            conteudo, 
+            jogo, 
             path: require('path') // Adicione esta linha
         });
         
@@ -316,7 +316,7 @@ app.post('/add-content', upload.array('imagens'), (req, res) => {
 
         // Salvar as informações no banco de dados
         db.run(
-            `INSERT INTO conteudo (nome, ano, plataforma, categoria, desenvolvedores, descricao, links, imagens, slug, data_criacao, data_modificacao) 
+            `INSERT INTO jogo (nome, ano, plataforma, categoria, desenvolvedores, descricao, links, imagens, slug, data_criacao, data_modificacao) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, 
             [
                 nome, 

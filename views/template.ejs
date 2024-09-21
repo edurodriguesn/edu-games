@@ -3,35 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= conteudo.titulo %></title>
+    <title><%= jogo.titulo %></title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 p-4">
-    <div class="mx-auto w-3/4 p-6 bg-white shadow-lg rounded-lg overflow-hidden">
+<body class="bg-gray-100">
+    <header class="bg-blue-900 text-white p-4 text-center ">
+        <h1 class="text-2xl font-semibold"><a href="/" class="hover:underline">Games Hub</a> - Central de Jogos sobre Computação</h1>
+    </header>
+    <div class="mx-auto w-3/4 p-6 my-6 bg-white shadow-lg rounded-lg overflow-hidden">
 
-        <!-- Título -->
         <div class="p-6">
-            <h1 class="text-4xl font-bold mb-4 text-center"><%= conteudo.titulo %></h1>
+            <h1 class="text-4xl font-bold mb-4 text-center"><%= jogo.titulo %></h1>
         </div>
-
-        <!-- Características -->
         <div class="p-6 mx-auto rounded-lg bg-blue-50 w-1/2">
-            <p class="text-gray-700 mb-4"><strong>Ano de Lançamento:</strong> <%= conteudo.ano %></p>
-            <p class="text-gray-700 mb-4"><strong>Plataforma:</strong> <%= conteudo.plataformas ? conteudo.plataformas.join(', ') : 'N/A' %></p>
-            <p class="text-gray-700 mb-4"><strong>Categoria:</strong> <%= conteudo.categorias ? conteudo.categorias.join(', ') : 'N/A' %></p>
-            <p class="text-gray-700 mb-4"><strong>Desenvolvedor:</strong> <%= conteudo.desenvolvedores ? conteudo.desenvolvedores.join(', ') : 'N/A' %></p>
+            <p class="text-gray-700 mb-4"><strong>Ano de Lançamento:</strong> <%= jogo.ano %></p>
+            <p class="text-gray-700 mb-4"><strong>Plataforma:</strong> <%= jogo.plataformas ? jogo.plataformas.join(', ') : 'N/A' %></p>
+            <p class="text-gray-700 mb-4"><strong>Categoria:</strong> <%= jogo.categorias ? jogo.categorias.join(', ') : 'N/A' %></p>
+            <p class="text-gray-700 mb-4"><strong>Desenvolvedor:</strong> <%= jogo.desenvolvedores ? jogo.desenvolvedores.join(', ') : 'N/A' %></p>
         </div>
-
-        <!-- Descrição -->
         <div class="p-6">
-            <p class="text-gray-700 mb-4"><%= conteudo.descricao %></p>
+            <p class="text-gray-700 mb-4"><%= jogo.descricao %></p>
             
-            <!-- Links Externos -->
-            <% if (conteudo.links && conteudo.links.length > 0) { %>
+            <% if (jogo.links && jogo.links.length > 0) { %>
                 <div class="mb-4">
                     <h2 class="text-2xl font-bold mb-2">Links Externos</h2>
                     <ul class="list-disc list-inside">
-                        <% conteudo.links.forEach(link => { %>
+                        <% jogo.links.forEach(link => { %>
                             <li><a href="<%= link.url %>" class="text-blue-500" target="_blank"><%= link.title %></a></li>
                         <% }) %>
                     </ul>
@@ -40,17 +37,40 @@
         </div>
 
         <!-- Screenshots (Imagens) -->
-        <% if (conteudo.imagens && conteudo.imagens.length > 0) { %>
+        <% if (jogo.imagens && jogo.imagens.length > 0) { %>
             <div class="p-6 bg-gray-50">
                 <h2 class="text-2xl font-bold mb-2">Screenshots</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <% conteudo.imagens.forEach((imagem, index) => { %>
-                        <img src="/uploads/<%= conteudo.slug %>/imagem-<%= index + 1 %><%= path.extname(imagem) %>" 
+                    <% jogo.imagens.forEach((imagem, index) => { %>
+                        <img src="/uploads/<%= jogo.slug %>/imagem-<%= index + 1 %><%= path.extname(imagem) %>" 
                              alt="imagem-<%= index + 1 %>" class="w-full h-64 object-cover">
                     <% }) %>
                 </div>
             </div>
         <% } %>
     </div>
+    <footer class="bg-blue-900 text-white px-8 py-4">
+        <div class="w-3/4 mx-auto">
+            <div class="flex justify-between items-center flex-col md:flex-row space-y-4 md:space-y-0">
+                <div class="flex items-center space-x-4">
+                    <div><a href="/" class="hover:underline"><img src="../imagens/logo.png" alt="logo" class="w-32"></a></div>
+                    <div><p>&copy; 2024 <a href="/" class="hover:underline">Games Hub</a>. Todos os direitos reservados.</p></div>
+                    
+                </div>
+    
+                <div class="flex space-x-4">
+                    <a href="/sobre" class="hover:underline">Sobre Nós</a>
+                    <a href="/contato" class="hover:underline">Contato</a>
+                    <a href="/politica-privacidade" class="hover:underline">Política de Privacidade</a>
+                    <a href="https://www2.unifap.br/ccomputacao/" class="hover:underline">Site do Curso</a>
+                </div>
+            </div>
+    
+            <div class="mt-4 text-center">
+                <p>Ciência da Computação | Universidade Federal do Amapá</p>
+                <p>Endereço: Rodovia Josmar Chaves Pinto - KM 02, 68903-419 - Macapá - AP</p>
+            </div>
+        </div>
+    </footer>
 </body>
 </html>

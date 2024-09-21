@@ -9,12 +9,12 @@
 <body class="bg-gray-100">
     <div class="bg-white w-4/5 mx-auto shadow-lg my-6 rounded-lg overflow-hidden p-6">
         <h1 class="text-2xl font-bold mb-4"><a href="/" class="hover:underline">Games Hub</a> - Administração de Jogos</h1>
-        <a href="/admin/conteudos/new" class="bg-blue-500 text-white rounded p-2 mb-4 inline-block">Adicionar Jogo</a>
+        <a href="/admin/jogos/adicionar" class="bg-blue-500 text-white rounded p-2 mb-4 inline-block">Adicionar Jogo</a>
     
         <h2 class="text-xl font-bold mb-4">Jogos Cadastrados</h2>
     
         <!-- Filtro de ordenação -->
-        <form action="/admin/conteudos" method="GET" class="mb-4">
+        <form action="/admin/jogos" method="GET" class="mb-4">
             <label for="sort" class="mr-2">Ordenar por:</label>
             <select name="sort" id="sort" class="border rounded p-2">
                 <option value="data_criacao" <% if (sort === 'data_criacao') { %> selected <% } %>>Data de Criação</option>
@@ -33,14 +33,14 @@
                 </tr>
             </thead>
             <tbody>
-                <% conteudos.forEach(conteudo => { %>
+                <% jogos.forEach(jogo => { %>
                     <tr>
-                        <td class="border p-2"><%= conteudo.nome %></td>
-                        <td class="border p-2"><%= new Date(conteudo.data_criacao).toLocaleString() %></td>
-                        <td class="border p-2"><%= new Date(conteudo.data_modificacao).toLocaleString() %></td>
+                        <td class="border p-2"><%= jogo.nome %></td>
+                        <td class="border p-2"><%= new Date(jogo.data_criacao).toLocaleString() %></td>
+                        <td class="border p-2"><%= new Date(jogo.data_modificacao).toLocaleString() %></td>
                         <td class="border p-2">
-                            <a href="/admin/conteudos/<%= conteudo.id %>/edit" class="bg-yellow-500 text-white rounded p-2">Editar</a>
-                            <form action="/admin/conteudos/<%= conteudo.id %>/delete" method="POST" class="inline">
+                            <a href="/admin/jogos/<%= jogo.id %>/edit" class="bg-yellow-500 text-white rounded p-2">Editar</a>
+                            <form action="/admin/jogos/<%= jogo.id %>/delete" method="POST" class="inline">
                                 <button type="submit" class="bg-red-500 text-white rounded p-2">Excluir</button>
                             </form>
                             
