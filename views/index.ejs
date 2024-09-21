@@ -18,144 +18,157 @@
 </head>
 <body class="bg-gray-100">
 
-    <!-- Título do site centralizado -->
-    <header class="bg-blue-900 text-white p-4 text-center">
-        <h1 class="text-2xl font-semibold">Games Hub - Central de Jogos sobre Computação</h1>
+    <header class="bg-blue-900 text-white p-4 text-center ">
+        <h1 class="text-2xl font-semibold"><a href="/" class="hover:underline">Games Hub</a> - Central de Jogos sobre Computação</h1>
     </header>
-
-    <div class="flex flex-col items-center p-4 w-4/5 mx-auto space-y-4">
-        <!-- Imagem da Capa -->
-        <div>
-            <img src="imagens/logo.png" alt="logo" class="w-48">
-        </div>
-    
-        <!-- Campo de Pesquisa -->
-        <div class="w-1/2">
-            <form action="/pesquisa" method="GET">
-                <input type="text" id="pesquisa" name="pesquisa" placeholder="Pesquisar"
-                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-2">
-            </form>
-        </div>
-    
-        <!-- Campo de Filtro -->
-        <div class="flex space-x-4 items-center">
-            <div class="bg-gray-200 text-gray-700 py-2 px-4 rounded">
-                Filtrar por...
+    <div class="bg-white w-4/5 mx-auto shadow-lg my-6 rounded-lg overflow-hidden">
+        <div class="flex flex-col items-center p-4 w-3/4 mx-auto space-y-4">
+            <div> <a href="/" class="hover:underline"><img src="imagens/logo.png" alt="logo" class="w-48"></a>  </div> <!-- Logo -->
+        
+            <div class="w-1/2"> <!-- Campo de Pesquisa -->
+                <form action="/pesquisa" method="GET">
+                    <input type="text" id="pesquisa" name="pesquisa" placeholder="Pesquisar"
+                        class="bg-gray-200 text-gray-700 mt-1 block w-full rounded-md shadow-sm p-2">
+                </form>
             </div>
-            <form action="/filtrar" method="GET">
-                <button name="plataforma" value="plataforma" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Plataforma</button>
-            </form>
-            <form action="/filtrar" method="GET">
-                <button name="categoria" value="categoria" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Categoria</button>
-            </form>
-            <form action="/filtrar" method="GET">
-                <button name="desenvolvedor" value="desenvolvedor" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Desenvolvedor</button>
-            </form>
+        
+            <div class="flex space-x-4 items-center"> <!-- Campo de Filtro -->
+                <div class="bg-gray-200 text-gray-700 py-2 px-4 rounded">
+                    Filtrar por...
+                </div>
+                <form action="/filtrar" method="GET">
+                    <button name="plataforma" value="plataforma" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Plataforma</button>
+                </form>
+                <form action="/filtrar" method="GET">
+                    <button name="categoria" value="categoria" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Categoria</button>
+                </form>
+                <form action="/filtrar" method="GET">
+                    <button name="desenvolvedor" value="desenvolvedor" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Desenvolvedor</button>
+                </form>
+            </div>
         </div>
-    </div>
-    
+        
+        <main class="p-4 w-3/4 mx-auto">
+            <section class="mb-8">
+                <h1 class="text-2xl text-center font-bold">Sobre o Projeto</h1>
+                <hr class="my-2">
+                <p class="text-gray-700 flex justify-between">
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eu felis malesuada, 
+                    convallis eros quis, commodo quam. Mauris laoreet magna ipsum. Phasellus consequat dolor et 
+                    lectus malesuada ullamcorper. Proin a pretium lacus, at ullamcorper lorem. Sed quis nibh ex. 
+                    Vestibulum et rhoncus nulla. Integer dapibus faucibus tristique. Cras lacinia laoreet nibh in facilisis.
+                    Curabitur non leo nec mauris posuere aliquam. Aenean ut vulputate libero. Sed nec volutpat nulla. Curabitur dapibus, dolor 
+                    id ornare malesuada, lacus lorem rhoncus ligula, non varius urna nunc ac quam. Pellentesque accumsan lacus risus, 
+                    ac vulputate neque luctus fringilla. Nunc finibus arcu purus, quis dapibus metus feugiat nec. Nullam lobortis interdum 
+                    bibendum. Nam venenatis vel nisl quis blandit. Donec vitae vulputate neque, sit amet ornare quam. Aliquam efficitur 
+                    tristique erat pretium iaculis. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac 
+                    turpis egestas. Pellentesque blandit lacinia lobortis. Nullam posuere nisi at placerat rhoncus. Lorem ipsum 
+                    dolor sit amet, consectetur adipiscing elit. Ut quis velit sed nisl rhoncus tristique.
+                    Cras vulputate nunc non mollis imperdiet. Nulla accumsan ultrices massa et pretium. Aliquam eu eros justo.
+                    Maecenas ut pretium nunc, nec malesuada arcu. Donec condimentum aliquet nulla at facilisis. 
+                    Duis sed commodo quam, vel facilisis diam. Praesent sit amet tortor sem.
+                    Vestibulum efficitur nec justo sit amet porttitor. Praesent cursus ac enim vel pharetra. Duis et 
+                    eleifend turpis. Sed suscipit erat at ipsum ullamcorper, a porta libero aliquet. Nunc elementum dui 
+                    nec metus maximus commodo. Duis libero nunc, volutpat ut tempor eu, iaculis eget est. Nunc tristique 
+                    nibh non nulla pharetra, nec feugiat nisi rutrum. Nullam mollis dolor ut velit varius, a scelerisque 
+                    orci consequat. Duis lacinia justo vel suscipit suscipit. Morbi id nulla ut nulla vehicula ornare.
+                    Donec sapien nulla, finibus a elementum sed, posuere mollis massa.
+                    Nam mollis auctor auctor. Maecenas purus est, eleifend et euismod nec, ultrices faucibus lectus. 
+                    Nunc tincidunt consectetur dolor at euismod. Proin dignissim, sem dignissim pretium auctor, leo lacus 
+                    mattis dui, a volutpat nunc ex ac turpis. Vestibulum egestas neque pharetra orci tristique commodo ut suscipit 
+                    lacus. Quisque interdum ipsum ante, nec luctus erat suscipit sit amet. Vestibulum ante ipsum primis in 
+                    faucibus orci luctus et ultrices posuere cubilia curae; Aenean hendrerit dui lectus. Donec ut dolor rhoncus, 
+                    condimentum libero ut, bibendum lorem.
+                </p>
+            </section>
 
-    <!-- Sobre o Projeto -->
-    <main class="p-4 w-4/5 mx-auto">
-        <section class="mb-8">
-            <h1 class="text-2xl text-center font-bold">Sobre o Projeto</h1>
-            <hr class="my-2">
-            <p class="text-gray-700 flex justify-between">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eu felis malesuada, 
-                convallis eros quis, commodo quam. Mauris laoreet magna ipsum. Phasellus consequat dolor et 
-                lectus malesuada ullamcorper. Proin a pretium lacus, at ullamcorper lorem. Sed quis nibh ex. 
-                Vestibulum et rhoncus nulla. Integer dapibus faucibus tristique. Cras lacinia laoreet nibh in facilisis.
-                Curabitur non leo nec mauris posuere aliquam. Aenean ut vulputate libero. Sed nec volutpat nulla. Curabitur dapibus, dolor 
-                id ornare malesuada, lacus lorem rhoncus ligula, non varius urna nunc ac quam. Pellentesque accumsan lacus risus, 
-                ac vulputate neque luctus fringilla. Nunc finibus arcu purus, quis dapibus metus feugiat nec. Nullam lobortis interdum 
-                bibendum. Nam venenatis vel nisl quis blandit. Donec vitae vulputate neque, sit amet ornare quam. Aliquam efficitur 
-                tristique erat pretium iaculis. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac 
-                turpis egestas. Pellentesque blandit lacinia lobortis. Nullam posuere nisi at placerat rhoncus. Lorem ipsum 
-                dolor sit amet, consectetur adipiscing elit. Ut quis velit sed nisl rhoncus tristique.
-                Cras vulputate nunc non mollis imperdiet. Nulla accumsan ultrices massa et pretium. Aliquam eu eros justo.
-                 Maecenas ut pretium nunc, nec malesuada arcu. Donec condimentum aliquet nulla at facilisis. 
-                 Duis sed commodo quam, vel facilisis diam. Praesent sit amet tortor sem.
-                Vestibulum efficitur nec justo sit amet porttitor. Praesent cursus ac enim vel pharetra. Duis et 
-                eleifend turpis. Sed suscipit erat at ipsum ullamcorper, a porta libero aliquet. Nunc elementum dui 
-                nec metus maximus commodo. Duis libero nunc, volutpat ut tempor eu, iaculis eget est. Nunc tristique 
-                nibh non nulla pharetra, nec feugiat nisi rutrum. Nullam mollis dolor ut velit varius, a scelerisque 
-                orci consequat. Duis lacinia justo vel suscipit suscipit. Morbi id nulla ut nulla vehicula ornare.
-                 Donec sapien nulla, finibus a elementum sed, posuere mollis massa.
-                Nam mollis auctor auctor. Maecenas purus est, eleifend et euismod nec, ultrices faucibus lectus. 
-                Nunc tincidunt consectetur dolor at euismod. Proin dignissim, sem dignissim pretium auctor, leo lacus 
-                mattis dui, a volutpat nunc ex ac turpis. Vestibulum egestas neque pharetra orci tristique commodo ut suscipit 
-                lacus. Quisque interdum ipsum ante, nec luctus erat suscipit sit amet. Vestibulum ante ipsum primis in 
-                faucibus orci luctus et ultrices posuere cubilia curae; Aenean hendrerit dui lectus. Donec ut dolor rhoncus, 
-                condimentum libero ut, bibendum lorem.
-            </p>
-        </section>
-
-        <!-- Galeria de Jogos -->
-        <section class="p-4 text-center">
-            <h1 class="text-2xl font-bold mb-4">Galeria de Jogos</h1>
-            <div class="grid grid-cols-3 gap-4">
-                <% conteudos.forEach(function(conteudo) { %>
-                <div class="game-card max-w-xs bg-white shadow-lg rounded-lg overflow-hidden relative">
-                    <a href="/jogos/<%= conteudo.slug %>.html">
-                        <div class="relative group game-card">
-                            <!-- Primeira Imagem -->
-                            <img class="w-full h-48 object-cover" src="/uploads/<%= conteudo.slug %>/imagem-1.jpg" alt="<%= conteudo.titulo %>">
-                        </div>
-                        
-                        <script>
-                            document.addEventListener('DOMContentLoaded', function() {
-                                const cards = document.querySelectorAll('.game-card');
-                        
-                                cards.forEach(card => {
-                                    let imageIndex = 1; // Começa a partir da imagem-1
-                                    const slug = '<%= conteudo.slug %>';
-                                    const baseUrl = '/uploads/' + slug + '/imagem-';
-                                    const fileExtension = '.jpg'; // Ajuste se necessário
-                                    let interval;
-                        
-                                    function checkImageExists(index) {
-                                        return fetch(`/check-image?slug=${slug}&imageName=imagem-${index}${fileExtension}`)
-                                            .then(response => response.ok);
-                                    }
-                        
-                                    function startImageRotation() {
-                                        interval = setInterval(() => {
-                                            checkImageExists(imageIndex)
-                                                .then(exists => {
-                                                    if (exists) {
-                                                        card.querySelector('img').src = baseUrl + imageIndex + fileExtension;
-                                                        imageIndex = (imageIndex % 10) + 1; // Ajuste 10 para o número máximo de imagens que você espera
-                                                    } else {
-                                                        imageIndex = 1; // Volta para a primeira imagem se a imagem não existir
-                                                    }
-                                                });
-                                        }, 1000); // Ajuste o delay conforme necessário
-                                    }
-                        
-                                    card.addEventListener('mouseenter', () => {
-                                        startImageRotation();
-                                    });
-                        
-                                    card.addEventListener('mouseleave', () => {
-                                        clearInterval(interval);
-                                        card.querySelector('img').src = baseUrl + '1' + fileExtension; // Volta para a primeira imagem
+            <section class="p-4 text-center"> <!-- Galeria de Jogos -->
+                <h1 class="text-2xl font-bold mb-4">Galeria de Jogos</h1>
+                <div class="grid grid-cols-3 gap-4">
+                    <% conteudos.forEach(function(conteudo) { %>
+                    <div class="game-card max-w-xs bg-white shadow-lg rounded-lg overflow-hidden relative">
+                        <a href="/jogos/<%= conteudo.slug %>.html">
+                            <div class="relative group game-card">
+                                <img class="w-full h-48 object-cover" src="/uploads/<%= conteudo.slug %>/imagem-1.jpg" alt="<%= conteudo.titulo %>"> <!-- Primeira Imagem -->
+                            </div>
+                            
+                            <script>
+                                document.addEventListener('DOMContentLoaded', function() {
+                                    const cards = document.querySelectorAll('.game-card');
+                            
+                                    cards.forEach(card => {
+                                        let imageIndex = 1; // Começa a partir da imagem-1
+                                        const slug = '<%= conteudo.slug %>';
+                                        const baseUrl = '/uploads/' + slug + '/imagem-';
+                                        const fileExtension = '.jpg';
+                                        let interval;
+                            
+                                        function checkImageExists(index) {
+                                            return fetch(`/check-image?slug=${slug}&imageName=imagem-${index}${fileExtension}`)
+                                                .then(response => response.ok);
+                                        }
+                            
+                                        function startImageRotation() {
+                                            interval = setInterval(() => {
+                                                checkImageExists(imageIndex)
+                                                    .then(exists => {
+                                                        if (exists) {
+                                                            card.querySelector('img').src = baseUrl + imageIndex + fileExtension;
+                                                            imageIndex = (imageIndex % 20) + 1;
+                                                        } else {
+                                                            imageIndex = 1; // Volta para a primeira imagem se a imagem não existir
+                                                        }
+                                                    });
+                                            }, 1000);//Delay de 1s por imagem
+                                        }
+                            
+                                        card.addEventListener('mouseenter', () => {
+                                            startImageRotation();
+                                        });
+                            
+                                        card.addEventListener('mouseleave', () => {
+                                            clearInterval(interval);
+                                            card.querySelector('img').src = baseUrl + '1' + fileExtension; // Volta para a primeira imagem se tirar o mouse
+                                        });
                                     });
                                 });
-                            });
-                        </script>
+                            </script>
+                                                                            
+                            <div class="p-4">
+                                <h2 class="text-lg font-bold"><%= conteudo.nome %></h2>
+                            </div>
+                        </a>
                         
-                                                                        
-                        <div class="p-4">
-                            <h2 class="text-lg font-bold"><%= conteudo.nome %></h2>
-                        </div>
-                    </a>
-                    
+                        
+                    </div>
+                    <% }); %>
+                </div>
+            </section>
+        </main>
+    </div>
+    <footer class="bg-blue-900 text-white px-8 py-4">
+        <div class="w-3/4 mx-auto">
+            <div class="flex justify-between items-center flex-col md:flex-row space-y-4 md:space-y-0">
+                <div class="flex items-center space-x-4">
+                    <div><a href="/" class="hover:underline"><img src="imagens/logo.png" alt="logo" class="w-32"></a></div>
+                    <div><p>&copy; 2024 <a href="/" class="hover:underline">Games Hub</a>. Todos os direitos reservados.</p></div>
                     
                 </div>
-                <% }); %>
+    
+                <div class="flex space-x-4">
+                    <a href="/sobre" class="hover:underline">Sobre Nós</a>
+                    <a href="/contato" class="hover:underline">Contato</a>
+                    <a href="/politica-privacidade" class="hover:underline">Política de Privacidade</a>
+                    <a href="https://www2.unifap.br/ccomputacao/" class="hover:underline">Site do Curso</a>
+                </div>
             </div>
-        </section>
-    </main>
+    
+            <div class="mt-4 text-center">
+                <p>Ciência da Computação | Universidade Federal do Amapá</p>
+                <p>Endereço: Rodovia Josmar Chaves Pinto - KM 02, 68903-419 - Macapá - AP</p>
+            </div>
+        </div>
+    </footer>
     
 </body>
 </html>

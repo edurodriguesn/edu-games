@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,15 +7,15 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 p-4">
-    <div class="max-w-screen-lg mx-auto bg-white shadow-lg rounded-lg overflow-hidden" style="width: 80%;">
+    <div class="mx-auto w-3/4 p-6 bg-white shadow-lg rounded-lg overflow-hidden">
 
         <!-- Título -->
-        <div class="p-4">
-            <h1 class="text-4xl font-bold mb-4"><%= conteudo.titulo %></h1>
+        <div class="p-6">
+            <h1 class="text-4xl font-bold mb-4 text-center"><%= conteudo.titulo %></h1>
         </div>
 
         <!-- Características -->
-        <div class="p-4 bg-blue-50">
+        <div class="p-6 mx-auto rounded-lg bg-blue-50 w-1/2">
             <p class="text-gray-700 mb-4"><strong>Ano de Lançamento:</strong> <%= conteudo.ano %></p>
             <p class="text-gray-700 mb-4"><strong>Plataforma:</strong> <%= conteudo.plataformas ? conteudo.plataformas.join(', ') : 'N/A' %></p>
             <p class="text-gray-700 mb-4"><strong>Categoria:</strong> <%= conteudo.categorias ? conteudo.categorias.join(', ') : 'N/A' %></p>
@@ -23,7 +23,7 @@
         </div>
 
         <!-- Descrição -->
-        <div class="p-4">
+        <div class="p-6">
             <p class="text-gray-700 mb-4"><%= conteudo.descricao %></p>
             
             <!-- Links Externos -->
@@ -41,7 +41,7 @@
 
         <!-- Screenshots (Imagens) -->
         <% if (conteudo.imagens && conteudo.imagens.length > 0) { %>
-            <div class="p-4 bg-gray-50">
+            <div class="p-6 bg-gray-50">
                 <h2 class="text-2xl font-bold mb-2">Screenshots</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <% conteudo.imagens.forEach((imagem, index) => { %>

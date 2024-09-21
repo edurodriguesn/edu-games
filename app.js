@@ -87,7 +87,9 @@ app.get('/check-image', (req, res) => {
         }
     });
 });
-
+app.get('/sobre', (req, res) => {
+    res.render('sobre');
+});
 
 /*==============================/
     PROCESSAMENTO DE LOGIN (OK!)
@@ -185,50 +187,6 @@ app.post('/admin/conteudos/:id/delete', isAuthenticated, (req, res) => {
 
 
 
-
-
-// Rota para renderizar a página de edição de conteúdo
-app.get('/admin/conteudos/:id/edit', isAuthenticated, (req, res) => {
-    const { id } = req.params;
-    db.get("SELECT * FROM conteudo WHERE id = ?", [id], (err, conteudo) => {
-        if (err) {
-            return res.status(500).send('Erro ao carregar o conteúdo');
-        }
-        res.render('edit-content', { conteudo });
-    });
-});
-// Rota para processar a edição de conteúdo
-app.post('/admin/conteudos/:id/edit', isAuthenticated, upload.array('imagens'), (req, res) => {
-    const { id } = req.params;
-    const { nome, ano, plataforma, categoria, desenvolvedores, descricao, linkTitle, linkURL } = req.body;
-    const linksExternos = Array.isArray(linkTitle) ? linkTitle.map((titulo, index) => ({ titulo, url: linkURL[index] })) : [{ titulo: linkTitle, url: linkURL }];
-    const slug = slugify(nome, { lower: true });
-
-    // Criar pasta com o nome do conteúdo em slug dentro da pasta 'uploads'
-    const contentDir = path.join(__dirname, 'uploads', slug);
-    if (!fs.existsSync(contentDir)) {
-        fs.mkdirSync(contentDir, { recursive: true });
-    }
-
-    // Mover imagens para a pasta criada
-    const imagens = req.files.map(file => {
-        const newFilePath = path.join(contentDir, file.originalname);
-        fs.renameSync(file.path, newFilePath);
-        return path.relative(__dirname, newFilePath);
-    });
-
-    const imagensStr = JSON.stringify(imagens);
-
-    db.run(`UPDATE conteudo SET nome = ?, ano = ?, plataforma = ?, categoria = ?, desenvolvedores = ?, imagens = ? WHERE id = ?`,
-        [nome, ano, plataforma, categoria, desenvolvedores, imagensStr, id],
-        (err) => {
-            if (err) {
-                return res.status(500).send('Erro ao atualizar o conteúdo');
-            }
-            res.redirect('/admin');
-        });
-});
-
 /*============================
        ADIÇÃO DE CONTEÚDO
   ============================*/
@@ -246,7 +204,7 @@ app.get('/admin/conteudos/new', isAuthenticated, (req, res) => {
                 if (err) {
                     return res.status(500).send('Erro ao carregar os desenvolvedores');
                 }
-                res.render('new-content', { plataformas, categorias, desenvolvedores });
+                res.render('novo-jogo', { plataformas, categorias, desenvolvedores });
             });
         });
     });
