@@ -22,6 +22,8 @@ app.use(session({
     saveUninitialized: true,
 }));
 
+app.use(express.static(path.join(__dirname, '/')));
+
 // Configuração para EJS: ok!
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -36,10 +38,10 @@ db.serialize(() => {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         nome TEXT NOT NULL,
         ano INTEGER,
-        plataforma TEXT,
-        categoria TEXT,
+        plataformas TEXT,
+        categorias TEXT,
         desenvolvedores TEXT,
-        descricao TEXT,                                      -- Campo para descrição do conteúdo
+        descricao TEXT,                                      -- Campo para descrição do jogo
         links TEXT,                                          -- Links externos (armazenado como JSON)
         imagens TEXT,                                        -- Imagens (armazenado como JSON)
         slug TEXT UNIQUE,                                    -- Slug único para URL amigável
@@ -71,7 +73,7 @@ app.get('/', (req, res) => {
         if (err) {
             throw err;
         }
-        res.render('index', { jogos: rows }); //carrega o template 'index' e envia a coluna conteúdos para o template
+        res.render('index', { jogos: rows }); //carrega o template 'index' e envia a coluna jogos para o template
     });
     
 });
@@ -118,35 +120,35 @@ function isAuthenticated(req, res, next) {
 }
 
 /*==========g===================
-    ADMINISTRAÇÃO DE CONTEÚDO
+    ADMINISTRAÇÃO DE jogo
   =============================*/
 // Rota para renderizar a página de admin: OK!
 app.get('/admin', isAuthenticated, (req, res) => {
     const sortField = req.query.sort === 'data_modificacao' ? 'data_modificacao' : 'data_criacao'; // Ordenar por data de criação como padrão
 
-    const query = `SELECT id, nome, data_criacao, data_modificacao FROM jogo ORDER BY ${sortField} DESC`;
+    const query = `SELECT id, nome, data_criacao, data_modificacao,slug FROM jogo ORDER BY ${sortField} DESC`;
 
     db.all(query, (err, jogos) => {
         if (err) {
-            return res.status(500).send('Erro ao carregar os conteúdos');
+            return res.status(500).send('Erro ao carregar os jogos');
         }
 
         res.render('admin', { jogos, sort: sortField });
     });
 });
 
-// Rota para excluir um conteúdo
+// Rota para excluir um jogo
 app.post('/admin/jogos/:id/delete', isAuthenticated, (req, res) => {
     const { id } = req.params;
 
     db.get("SELECT * FROM jogo WHERE id = ?", [id], (err, jogo) => {
         if (err) {
-            return res.status(500).send('Erro ao carregar o conteúdo');
+            return res.status(500).send('Erro ao carregar o jogo');
         }
 
-        // Verificar se o conteúdo foi encontrado
+        // Verificar se o jogo foi encontrado
         if (!jogo) {
-            return res.status(404).send('Conteúdo não encontrado');
+            return res.status(404).send('jogo não encontrado');
         }
 
         // Excluir imagens do sistema de arquivos usando o slug do nome
@@ -173,10 +175,10 @@ app.post('/admin/jogos/:id/delete', isAuthenticated, (req, res) => {
             fs.unlinkSync(htmlFilePath); // Excluir o arquivo HTML
         }
 
-        // Excluir o conteúdo do banco de dados
+        // Excluir o jogo do banco de dados
         db.run("DELETE FROM jogo WHERE id = ?", [id], (err) => {
             if (err) {
-                return res.status(500).send('Erro ao excluir o conteúdo');
+                return res.status(500).send('Erro ao excluir o jogo');
             }
 
             // Redirecionar para a página de administração
@@ -188,9 +190,9 @@ app.post('/admin/jogos/:id/delete', isAuthenticated, (req, res) => {
 
 
 /*============================
-       ADIÇÃO DE CONTEÚDO
+       ADIÇÃO DE jogo
   ============================*/
-// Rota para renderizar a página de criação de novo conteúdo: OK!
+// Rota para renderizar a página de criação de novo jogo: OK!
 app.get('/admin/jogos/adicionar', isAuthenticated, (req, res) => {
     db.all("SELECT nome FROM plataforma", (err, plataformas) => {
         if (err) {
@@ -250,9 +252,9 @@ app.post('/add-option', (req, res) => {
 
 
 
-// Rota para adicionar conteúdo
-// Adicionar novo conteúdo
-app.post('/add-content', upload.array('imagens'), (req, res) => {
+// Rota para adicionar jogo
+// Adicionar novo jogo
+app.post('/adicionarjogo', upload.array('imagens'), (req, res) => {
     try {
         const { nome, ano, plataforma, categoria, desenvolvedor, descricao, linkTitle, linkURL } = req.body;
 
@@ -270,14 +272,14 @@ app.post('/add-content', upload.array('imagens'), (req, res) => {
         
         const slug = slugify(nome, { lower: true });
 
-        // Criar pasta para as imagens do conteúdo
+        // Criar pasta para as imagens do jogo
         const contentDir = path.join(__dirname, 'public', 'uploads', slug);
         if (!fs.existsSync(contentDir)) {
             fs.mkdirSync(contentDir, { recursive: true });
         }
 
-        // Mover as imagens para a pasta do conteúdo e renomeá-las
-        // Mover as imagens para a pasta do conteúdo e renomeá-las
+        // Mover as imagens para a pasta do jogo e renomeá-las
+        // Mover as imagens para a pasta do jogo e renomeá-las
         const imagens = req.files.map((file, index) => {
             const newFileName = `imagem-${index + 1}${path.extname(file.originalname)}`; // Renomeia como imagem-1, imagem-2, etc.
             const newFilePath = path.join(contentDir, newFileName);
@@ -286,7 +288,7 @@ app.post('/add-content', upload.array('imagens'), (req, res) => {
         });
 
 
-        // Dados do conteúdo
+        // Dados do jogo
         const jogo = {
             id: this.lastID,
             titulo: nome,
@@ -307,7 +309,7 @@ app.post('/add-content', upload.array('imagens'), (req, res) => {
             path: require('path') // Adicione esta linha
         });
         
-        // Salvar a página HTML na pasta do conteúdo
+        // Salvar a página HTML na pasta do jogo
         const htmlFilePath = path.join(__dirname, 'public', 'jogos', `${slug}.html`);
         fs.writeFileSync(htmlFilePath, htmlContent);
 
@@ -316,7 +318,7 @@ app.post('/add-content', upload.array('imagens'), (req, res) => {
 
         // Salvar as informações no banco de dados
         db.run(
-            `INSERT INTO jogo (nome, ano, plataforma, categoria, desenvolvedores, descricao, links, imagens, slug, data_criacao, data_modificacao) 
+            `INSERT INTO jogo (nome, ano, plataformas, categorias, desenvolvedores, descricao, links, imagens, slug, data_criacao, data_modificacao) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, 
             [
                 nome, 
@@ -334,22 +336,194 @@ app.post('/add-content', upload.array('imagens'), (req, res) => {
             (err) => {
                 if (err) {
                     console.error(err);
-                    return res.status(500).json({ success: false, message: 'Erro ao salvar o conteúdo no banco de dados' });
+                    return res.status(500).json({ success: false, message: 'Erro ao salvar o jogo no banco de dados' });
                 }
                 res.redirect('/admin'); // Redirecionar para a página de administração
             }
         );
     } catch (error) {
         console.error(error);
-        res.status(500).json({ success: false, message: 'Erro ao adicionar o conteúdo' });
+        res.status(500).json({ success: false, message: 'Erro ao adicionar o jogo' });
     }
+    
+
+});
+
+app.get('/admin/jogos/editar/:slug', isAuthenticated, (req, res) => {
+    const slug = req.params.slug;
+
+    db.get(`SELECT * FROM jogo WHERE slug = ?`, [slug], (err, jogo) => {
+        if (err || !jogo) {
+            return res.status(404).send('Jogo não encontrado');
+        }
+
+        // Certifique-se de que as propriedades sejam arrays
+        jogo.plataformas = jogo.plataformas ? JSON.parse(jogo.plataformas) : [];
+        jogo.categorias = jogo.categorias ? JSON.parse(jogo.categorias) : [];
+        jogo.desenvolvedores = jogo.desenvolvedores ? JSON.parse(jogo.desenvolvedores) : [];
+        jogo.links = jogo.links ? JSON.parse(jogo.links) : [];
+        jogo.imagens = jogo.imagens ? JSON.parse(jogo.imagens) : [];
+
+        // Carregue as listas de plataformas, categorias e desenvolvedores
+        db.all("SELECT nome FROM plataforma", (err, plataformas) => {
+            if (err) {
+                return res.status(500).send('Erro ao carregar as plataformas');
+            }
+            db.all("SELECT nome FROM categoria", (err, categorias) => {
+                if (err) {
+                    return res.status(500).send('Erro ao carregar as categorias');
+                }
+                db.all("SELECT nome FROM desenvolvedor", (err, desenvolvedores) => {
+                    if (err) {
+                        return res.status(500).send('Erro ao carregar os desenvolvedores');
+                    }
+                    res.render('editar-jogo', { jogo, plataformas, categorias, desenvolvedores });
+                });
+            });
+        });
+    });
 });
 
 
+app.post('/editar-jogo/:slug', upload.array('imagens'), (req, res) => {
+    const slug = req.params.slug;
 
-// Adicionar uma nova característica (plataforma, categoria ou desenvolvedor)
+    db.get("SELECT * FROM jogo WHERE slug = ?", [slug], (err, jogoAntigo) => {
+        if (err || !jogoAntigo) {
+            return res.status(404).send('Jogo não encontrado');
+        }
 
+        try {
+            const { nome, ano, plataforma, categoria, desenvolvedor, descricao, linkTitle, linkURL, imagensRemovidas } = req.body;
 
+            // Se os campos não foram enviados ou estão vazios, mantemos os valores antigos.
+            const novoNome = nome || jogoAntigo.nome;
+            const novoAno = ano || jogoAntigo.ano;
+            const novaDescricao = descricao || jogoAntigo.descricao;
+
+            // Manter as plataformas, categorias e desenvolvedores, e combinar com os novos valores
+            const plataformasAntigas = JSON.parse(jogoAntigo.plataformas);
+            const plataformasNovas = plataforma ? (Array.isArray(plataforma) ? plataforma : [plataforma].filter(Boolean)) : [];
+            const plataformasCombinadas = [...plataformasAntigas, ...plataformasNovas]; // Combina as novas com as antigas
+
+            const categoriasAntigas = JSON.parse(jogoAntigo.categorias);
+            const categoriasNovas = categoria ? (Array.isArray(categoria) ? categoria : [categoria].filter(Boolean)) : [];
+            const categoriasCombinadas = [...categoriasAntigas, ...categoriasNovas];
+
+            const desenvolvedoresAntigos = JSON.parse(jogoAntigo.desenvolvedores);
+            const desenvolvedoresNovos = desenvolvedor ? (Array.isArray(desenvolvedor) ? desenvolvedor : [desenvolvedor].filter(Boolean)) : [];
+            const desenvolvedoresCombinados = [...desenvolvedoresAntigos, ...desenvolvedoresNovos];
+
+            // Links externos
+            let linksExternos = [];
+            if (Array.isArray(linkTitle) && Array.isArray(linkURL)) {
+                // Se ambos são arrays, mapear normalmente
+                linksExternos = linkTitle.map((titulo, index) => ({ title: titulo, url: linkURL[index] }));
+            } else if (linkTitle && linkURL) {
+                // Se existe apenas um link (string única), transforma em um array de objeto
+                linksExternos = [{ title: linkTitle, url: linkURL }];
+            } else {
+                // Se os links não foram alterados, mantém os existentes
+                linksExternos = JSON.parse(jogoAntigo.links);
+            }
+
+            // Gerar o novo slug
+            const novoSlug = slugify(novoNome, { lower: true });
+            const novoContentDir = path.join(__dirname, 'public', 'uploads', novoSlug);
+            const antigoContentDir = path.join(__dirname, 'public', 'uploads', slug);
+
+            // Se o nome mudou, renomeia a pasta de imagens
+            if (novoSlug !== slug) {
+                if (fs.existsSync(antigoContentDir)) {
+                    fs.renameSync(antigoContentDir, novoContentDir);
+                }
+            }
+
+            let novasImagens = [];
+            let imagensAlteradas = false;
+
+            // Se não houve alteração nas imagens, mantém as imagens existentes
+            let imagensFinal = JSON.parse(jogoAntigo.imagens);
+
+            // Excluir imagens removidas
+            if (imagensRemovidas) {
+                const imagensParaRemover = JSON.parse(imagensRemovidas);
+                imagensParaRemover.forEach(imagem => {
+                    const filePath = path.join(novoContentDir, imagem);
+                    if (fs.existsSync(filePath)) {
+                        fs.unlinkSync(filePath);
+                    }
+                });
+                imagensFinal = imagensFinal.filter(imagem => !imagensParaRemover.includes(imagem));
+                imagensAlteradas = true; // Sinaliza que houve uma exclusão de imagens
+            }
+
+            // Verifica quantas imagens já existem e define o índice inicial para as novas imagens
+            let indiceInicial = imagensFinal.length;
+
+            // Verifica se existem novas imagens para adicionar
+            if (req.files.length > 0) {
+                novasImagens = req.files.map((file, index) => {
+                    const newFileName = `imagem-${indiceInicial + index + 1}${path.extname(file.originalname)}`;
+                    const newFilePath = path.join(novoContentDir, newFileName);
+                    fs.renameSync(file.path, newFilePath);
+                    return newFileName;
+                });
+                imagensAlteradas = true; // Sinaliza que houve uma inserção de imagens
+            }
+
+            if (imagensAlteradas) {
+                // Combina as novas imagens com as existentes
+                imagensFinal = [...imagensFinal, ...novasImagens].filter(Boolean);
+            }
+
+            // Atualizar o jogo no banco de dados
+            const dataAtual = new Date().toISOString();
+            db.run(
+                `UPDATE jogo SET nome = ?, ano = ?, plataformas = ?, categorias = ?, desenvolvedores = ?, descricao = ?, links = ?, imagens = ?, slug = ?, data_modificacao = ? WHERE slug = ?`, 
+                [
+                    novoNome, 
+                    novoAno, 
+                    JSON.stringify(plataformasCombinadas),  // Usar as plataformas combinadas
+                    JSON.stringify(categoriasCombinadas),  // Usar as categorias combinadas
+                    JSON.stringify(desenvolvedoresCombinados),  // Usar os desenvolvedores combinados
+                    novaDescricao, 
+                    JSON.stringify(linksExternos), 
+                    JSON.stringify(imagensFinal), 
+                    novoSlug, 
+                    dataAtual,
+                    slug
+                ], 
+                (err) => {
+                    if (err) {
+                        console.error(err);
+                        return res.status(500).json({ success: false, message: 'Erro ao atualizar o jogo no banco de dados' });
+                    }
+
+                    // Se o nome do jogo mudou, remove a página HTML antiga
+                    const antigoHtmlFilePath = path.join(__dirname, 'public', 'jogos', `${slug}.html`);
+                    if (fs.existsSync(antigoHtmlFilePath)) {
+                        fs.unlinkSync(antigoHtmlFilePath);
+                    }
+
+                    // Criar nova página HTML
+                    const templatePath = path.join(__dirname, 'views', 'template.ejs');
+                    const novoHtmlContent = ejs.render(fs.readFileSync(templatePath, 'utf-8'), { 
+                        jogo: { ...jogoAntigo, nome: novoNome, ano: novoAno, descricao: novaDescricao, plataformas: plataformasCombinadas, categorias: categoriasCombinadas, desenvolvedores: desenvolvedoresCombinados, slug: novoSlug, imagens: imagensFinal, links: linksExternos }, 
+                        path: require('path') 
+                    });
+                    const novoHtmlFilePath = path.join(__dirname, 'public', 'jogos', `${novoSlug}.html`);
+                    fs.writeFileSync(novoHtmlFilePath, novoHtmlContent);
+
+                    res.redirect('/admin'); // Redirecionar para a página de administração
+                }
+            );
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ success: false, message: 'Erro ao editar o jogo' });
+        }
+    });
+});
 
 // Inicialização do servidor
 const PORT = process.env.PORT || 3000;

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Jogo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+    <div class="bg-white w-3/5 mx-auto shadow-lg my-6 rounded-lg overflow-hidden py-8 px-20">
+        <div class="flex justify-between items-center mb-8">
+            <span><a href="/admin" class="hover:underline bg-gray-200 text-black p-2 rounded mt-2">Voltar</a></span>
+            <h1 class="flex-1 text-center text-2xl font-bold">Editar Jogo</h1>
+        </div>
+        
+        <form action="/editar-jogo/<%= jogo.slug %>" method="POST" enctype="multipart/form-data">
+            <div class="mb-4 flex">
+                <div class="w-1/2 pr-2">
+                    <label for="nome" class="block text-sm font-medium text-gray-700">Nome do Jogo</label>
+                    <input type="text" id="nome" name="nome" class="border rounded p-2 w-full" value="<%= jogo.nome %>" required>
+                </div>
+                <div class="w-1/5 pl-2"> 
+                    <label for="ano" class="block text-sm font-medium text-gray-700">Ano de Lançamento</label>
+                    <input type="number" id="ano" name="ano" class="border rounded p-2 w-full" value="<%= jogo.ano %>" required>
+                </div>
+            </div>
+
+            <!-- Plataforma, Categoria e Desenvolvedor -->
+            <div class="mb-4 flex">
+                <!-- Plataforma -->
+                <div class="w-1/3 pr-2">
+                    <label for="plataforma" class="block text-sm font-medium text-gray-700">Plataforma</label>
+                    <select id="plataforma" class="border rounded p-2 w-full">
+                        <option value="">Selecione uma Plataforma</option>
+                        <% plataformas.forEach(plataforma => { %>
+                            <option value="<%= plataforma.nome %>" <%= jogo.plataformas.includes(plataforma.nome) ? 'selected' : '' %>><%= plataforma.nome %></option>
+                        <% }) %>
+                    </select>
+                    <button type="button" onclick="addOptionField('plataforma', 'plataformas-container')" class="bg-blue-500 text-white p-2 rounded mt-2">Incluir</button>
+                    <input type="text" id="newPlataforma" class="border rounded p-2 w-full mt-2" placeholder="Nova Plataforma">
+                    <button type="button" onclick="addNewOption('plataforma', 'newPlataforma', 'plataformas-container')" class="bg-green-500 text-white p-2 rounded mt-2">Inserir Nova Plataforma</button>
+                    <div id="plataformas-container" class="mt-2">
+                        <% jogo.plataformas.forEach(plataforma => { %>
+                            <div class="flex items-center mt-2">
+                                <input type="text" name="plataformas" value="<%= plataforma %>" class="border rounded p-2 w-full" readonly>
+                                <button type="button" class="bg-red-500 text-white font-bold rounded px-3 py-1 ml-2" onclick="createRemoveButton(document.getElementById('plataformas-container'), this.parentNode)">X</button>
+                            </div>
+                        <% }) %>
+                    </div>
+                </div>
+
+                <!-- Categoria -->
+                <div class="w-1/3 px-2">
+                    <label for="categoria" class="block text-sm font-medium text-gray-700">Categoria</label>
+                    <select id="categoria" class="border rounded p-2 w-full">
+                        <option value="">Selecione uma Categoria</option>
+                        <% categorias.forEach(categoria => { %>
+                            <option value="<%= categoria.nome %>" <%= jogo.categorias.includes(categoria.nome) ? 'selected' : '' %>><%= categoria.nome %></option>
+                        <% }) %>
+                    </select>
+                    <button type="button" onclick="addOptionField('categoria', 'categorias-container')" class="bg-blue-500 text-white p-2 rounded mt-2">Incluir</button>
+                    <input type="text" id="newCategoria" class="border rounded p-2 w-full mt-2" placeholder="Nova Categoria">
+                    <button type="button" onclick="addNewOption('categoria', 'newCategoria', 'categorias-container')" class="bg-green-500 text-white p-2 rounded mt-2">Inserir Nova Categoria</button>
+                    <div id="categorias-container" class="mt-2">
+                        <% jogo.categorias.forEach(categoria => { %>
+                            <div class="flex items-center mt-2">
+                                <input type="text" value="<%= categoria %>" class="border rounded p-2 w-full" readonly>
+                                <button type="button" class="bg-red-500 text-white font-bold rounded px-3 py-1 ml-2" onclick="createRemoveButton(document.getElementById('categorias-container'), this.parentNode)">X</button>
+                            </div>
+                        <% }) %>
+                    </div>
+                </div>
+
+                <!-- Desenvolvedor -->
+                <div class="w-1/3 pl-2">
+                    <label for="desenvolvedor" class="block text-sm font-medium text-gray-700">Desenvolvedor</label>
+                    <select id="desenvolvedor" class="border rounded p-2 w-full">
+                        <option value="">Selecione um Desenvolvedor</option>
+                        <% desenvolvedores.forEach(desenvolvedor => { %>
+                            <option value="<%= desenvolvedor.nome %>" <%= jogo.desenvolvedores.includes(desenvolvedor.nome) ? 'selected' : '' %>><%= desenvolvedor.nome %></option>
+                        <% }) %>
+                    </select>
+                    <button type="button" onclick="addOptionField('desenvolvedor', 'desenvolvedores-container')" class="bg-blue-500 text-white p-2 rounded mt-2">Incluir</button>
+                    <input type="text" id="newDesenvolvedor" class="border rounded p-2 w-full mt-2" placeholder="Novo Desenvolvedor">
+                    <button type="button" onclick="addNewOption('desenvolvedor', 'newDesenvolvedor', 'desenvolvedores-container')" class="bg-green-500 text-white p-2 rounded mt-2">Inserir Novo Desenvolvedor</button>
+                    <div id="desenvolvedores-container" class="mt-2">
+                        <% jogo.desenvolvedores.forEach(desenvolvedor => { %>
+                            <div class="flex items-center mt-2">
+                                <input type="text" value="<%= desenvolvedor %>" class="border rounded p-2 w-full" readonly>
+                                <button type="button" class="bg-red-500 text-white font-bold rounded px-3 py-1 ml-2" onclick="createRemoveButton(document.getElementById('desenvolvedores-container'), this.parentNode)">X</button>
+                            </div>
+                        <% }) %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label for="descricao" class="block text-sm font-medium text-gray-700">Descrição</label>
+                <textarea id="descricao" name="descricao" class="border rounded p-2 w-full" required oninput="autoResize(this)"><%= jogo.descricao %> </textarea>
+            </div>
+            
+            <!-- Links -->
+            <div class="mb-4">
+                <h2 class="text-lg font-bold">Links Externos</h2>
+                <div id="link-fields" class="mb-4">
+                    <% jogo.links.forEach(link => { %>
+                        <div class="flex items-center mb-2">
+                            <input type="text" name="linkTitle" value="<%= link.title %>" class="border rounded p-2 w-1/2 mr-2" required>
+                            <input type="url" name="linkURL" value="<%= link.url %>" class="border rounded p-2 w-1/2 mr-2" required>
+                            <button type="button" class="bg-red-500 text-white p-2 rounded" onclick="createRemoveButton(document.getElementById('link-fields'), this.parentNode)">X</button>
+                        </div>
+                    <% }) %>
+                </div>
+                <button type="button" onclick="addLinkField()" class="bg-blue-500 text-white p-2 rounded mb-2">Adicionar Link Externo</button>
+            </div>
+
+            <!-- Imagens -->
+            <div class="mb-4">
+                <h2 class="text-lg font-bold">Imagens</h2>
+                <div id="image-fields" class="flex flex-wrap">
+                    <% jogo.imagens.forEach(imagem => { %>
+                        <div class="flex items-center mb-2">
+                            <input type="text" name="imagens" value="<%= imagem %>" class="border rounded p-2 w-1/2 mr-2" required>
+                            <button type="button" class="bg-red-500 text-white p-2 rounded" onclick="createRemoveButton(document.getElementById('image-fields'), this.parentNode)">X</button>
+                        </div>
+                    <% }) %>
+                </div>
+                <button type="button" onclick="addImageField()" class="bg-blue-500 text-white p-2 rounded mb-2">Adicionar Imagem</button>
+            </div>
+            
+            <div class="flex justify-center mt-4">
+                <button type="submit" class="bg-green-500 text-white p-2 rounded w-1/6 text-2xl font-bold hover:underline">Salvar</button>
+            </div>
+        </form>
+    </div>
+    <script src="/utils.js"></script>
+</body>
+</html>
