@@ -14,6 +14,18 @@
         </div>
         
         <form action="/editar-jogo/<%= jogo.slug %>" method="POST" enctype="multipart/form-data">
+            <div class="mb-4 flex justify-center">
+                <div class="w-full">
+                    <label for="imagemCapa" class="block text-sm font-medium text-gray-700 text-center">Imagem de Capa</label>
+                    <input type="file" id="imagemCapa" name="imagemCapa" class="border rounded p-2 w-full mt-2" accept="image/*">
+                    <% if (jogo.imagens && jogo.imagens.length > 0) { %>
+                        <img src="data:image/jpeg;base64,<%= jogo.imagens[0] %>" alt="Imagem de Capa" class="w-full h-auto mt-2 rounded">
+                    <% } %>
+                </div>
+                
+                
+            </div>
+
             <div class="mb-4 flex">
                 <div class="w-1/2 pr-2">
                     <label for="nome" class="block text-sm font-medium text-gray-700">Nome do Jogo</label>
@@ -96,12 +108,11 @@
 
             <div class="mb-4">
                 <label for="descricao" class="block text-sm font-medium text-gray-700">Descrição</label>
-                <textarea id="descricao" name="descricao" class="border rounded p-2 w-full" required oninput="autoResize(this)"><%= jogo.descricao %> </textarea>
-            </div>
+                <textarea id="descricao" name="descricao" class="border rounded p-2 w-full" required oninput="autoResize(this)"><%= jogo.descricao %></textarea>
+            </div>         
             
-            <!-- Links -->
             <div class="mb-4">
-                <h2 class="text-lg font-bold">Links Externos</h2>
+                <button type="button" onclick="addLinkField()" class="bg-blue-500 text-white p-2 rounded mb-2">Adicionar Link Externo</button>
                 <div id="link-fields" class="mb-4">
                     <% jogo.links.forEach(link => { %>
                         <div class="flex items-center mb-2">
@@ -111,22 +122,24 @@
                         </div>
                     <% }) %>
                 </div>
-                <button type="button" onclick="addLinkField()" class="bg-blue-500 text-white p-2 rounded mb-2">Adicionar Link Externo</button>
             </div>
 
-            <!-- Imagens -->
-            <div class="mb-4">
-                <h2 class="text-lg font-bold">Imagens</h2>
-                <div id="image-fields" class="flex flex-wrap">
-                    <% jogo.imagens.forEach(imagem => { %>
-                        <div class="flex items-center mb-2">
-                            <input type="text" name="imagens" value="<%= imagem %>" class="border rounded p-2 w-1/2 mr-2" required>
-                            <button type="button" class="bg-red-500 text-white p-2 rounded" onclick="createRemoveButton(document.getElementById('image-fields'), this.parentNode)">X</button>
-                        </div>
-                    <% }) %>
-                </div>
-                <button type="button" onclick="addImageField()" class="bg-blue-500 text-white p-2 rounded mb-2">Adicionar Imagem</button>
+            <div id="image-fields" class="flex flex-wrap justify-center">
+                <% jogo.outrasImagens.forEach((imagem, index) => { %>
+                    <div class="flex items-center mb-2 image-container">
+                        <img src="data:image/jpeg;base64,<%= imagem %>" alt="Imagem" class="w-40 h-40 object-cover mr-2">
+                        <button type="button" class="bg-red-500 text-white p-2 rounded" onclick="removeImage(this.parentNode, '<%= imagem %>')">X</button>
+                    </div>
+                <% }) %>
             </div>
+            
+            <!-- Campo oculto para enviar as imagens removidas -->
+            <input type="hidden" id="removedImages" name="removedImages" value="">
+            <button type="button" onclick="addImageField()" class="bg-blue-500 text-white p-2 rounded mb-2">Adicionar Imagem</button>
+            
+            
+            
+            
             
             <div class="flex justify-center mt-4">
                 <button type="submit" class="bg-green-500 text-white p-2 rounded w-1/6 text-2xl font-bold hover:underline">Salvar</button>

@@ -8,7 +8,19 @@ const slugify = require('slugify');
 const ejs = require('ejs');
 
 const app = express();
-const upload = multer({ dest: 'uploads/' });
+
+
+
+// Configuração do multer para armazenar imagens na memória como Buffer
+const storage = multer.memoryStorage();
+
+const upload = multer({
+    limits: {
+        fileSize: 10 * 1024 * 1024, // 10MB por arquivo, ajuste conforme necessário
+        fieldSize: 20 * 1024 * 1024, // Limite máximo para todos os campos (ajustar conforme necessário)
+    },
+});
+
 const db = new sqlite3.Database('./db/database.db');
 
 // Middleware para processar o corpo da requisição
@@ -30,7 +42,6 @@ app.set('views', path.join(__dirname, 'views'));
 
 // Middleware para servir arquivos estáticos
 app.use(express.static('public'));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Criar tabelas se não existirem: OK!
 db.serialize(() => {
@@ -69,26 +80,23 @@ db.serialize(() => {
 
 //renderizar pagina inicial: OK!
 app.get('/', (req, res) => {
-    db.all("SELECT * FROM jogo", [], (err, rows) => {
+    db.all("SELECT nome, slug, imagens FROM jogo", [], (err, rows) => {
         if (err) {
             throw err;
         }
-        res.render('index', { jogos: rows }); //carrega o template 'index' e envia a coluna jogos para o template
-    });
-    
-});
-app.get('/check-image', (req, res) => {
-    const { slug, imageName } = req.query;
-    const filePath = path.join(__dirname, 'public', 'uploads', slug, imageName);
+        
+        // Mapeia os resultados para incluir apenas os campos desejados
+        const jogos = rows.map(row => ({
+            nome: row.nome,
+            slug: row.slug,
+            imagens: JSON.parse(row.imagens) // Supondo que as imagens estejam em formato JSON
+        }));
 
-    fs.access(filePath, fs.constants.F_OK, (err) => {
-        if (err) {
-            res.status(404).send('Not Found');
-        } else {
-            res.status(200).send('Exists');
-        }
+        res.render('index', { jogos });
     });
 });
+
+
 app.get('/sobre', (req, res) => {
     res.render('sobre');
 });
@@ -149,30 +157,6 @@ app.post('/admin/jogos/:id/delete', isAuthenticated, (req, res) => {
         // Verificar se o jogo foi encontrado
         if (!jogo) {
             return res.status(404).send('jogo não encontrado');
-        }
-
-        // Excluir imagens do sistema de arquivos usando o slug do nome
-        const slug = jogo.slug; // Assumindo que o slug é um campo da tabela 'jogo'
-        const imagens = JSON.parse(jogo.imagens); // Assumindo que as imagens são armazenadas como JSON
-
-        // Excluir cada imagem dentro do diretório
-        imagens.forEach(imagem => {
-            const imagePath = path.join(__dirname, 'public/uploads', slug, imagem);
-            if (fs.existsSync(imagePath)) {
-                fs.unlinkSync(imagePath); // Excluir a imagem
-            }
-        });
-
-        // Remover o diretório do slug de forma recursiva (inclui arquivos)
-        const slugDir = path.join(__dirname, 'public/uploads', slug);
-        if (fs.existsSync(slugDir)) {
-            fs.rmSync(slugDir, { recursive: true, force: true }); // Exclui o diretório mesmo se não estiver vazio
-        }
-
-        // Excluir o arquivo HTML correspondente
-        const htmlFilePath = path.join(__dirname, 'public/jogos', `${slug}.html`);
-        if (fs.existsSync(htmlFilePath)) {
-            fs.unlinkSync(htmlFilePath); // Excluir o arquivo HTML
         }
 
         // Excluir o jogo do banco de dados
@@ -251,10 +235,9 @@ app.post('/add-option', (req, res) => {
 });
 
 
-
 // Rota para adicionar jogo
 // Adicionar novo jogo
-app.post('/adicionarjogo', upload.array('imagens'), (req, res) => {
+app.post('/adicionarjogo', upload.fields([{ name: 'imagemCapa', maxCount: 1 }, { name: 'imagens' }]), (req, res) => {
     try {
         const { nome, ano, plataforma, categoria, desenvolvedor, descricao, linkTitle, linkURL } = req.body;
 
@@ -262,56 +245,33 @@ app.post('/adicionarjogo', upload.array('imagens'), (req, res) => {
         const plataformas = Array.isArray(plataforma) ? plataforma : [plataforma].filter(Boolean);
         const categorias = Array.isArray(categoria) ? categoria : [categoria].filter(Boolean);
         const desenvolvedores = Array.isArray(desenvolvedor) ? desenvolvedor : [desenvolvedor].filter(Boolean);
-        
+
         // Links externos
-        const linksExternos = Array.isArray(linkTitle) && Array.isArray(linkURL) 
-            ? linkTitle.map((titulo, index) => ({ title: titulo, url: linkURL[index] })) 
-            : linkTitle && linkURL 
-                ? [{ title: linkTitle, url: linkURL }] 
+        const linksExternos = Array.isArray(linkTitle) && Array.isArray(linkURL)
+            ? linkTitle.map((titulo, index) => ({ title: titulo, url: linkURL[index] }))
+            : linkTitle && linkURL
+                ? [{ title: linkTitle, url: linkURL }]
                 : [];
-        
+
         const slug = slugify(nome, { lower: true });
 
-        // Criar pasta para as imagens do jogo
-        const contentDir = path.join(__dirname, 'public', 'uploads', slug);
-        if (!fs.existsSync(contentDir)) {
-            fs.mkdirSync(contentDir, { recursive: true });
+        // Processar imagem de capa
+        let capaBase64 = null;
+        if (req.files.imagemCapa) {
+            const capaBuffer = req.files.imagemCapa[0].buffer;  // Pega o buffer da imagem da memória
+            capaBase64 = capaBuffer.toString('base64');  // Converte para base64
         }
 
-        // Mover as imagens para a pasta do jogo e renomeá-las
-        // Mover as imagens para a pasta do jogo e renomeá-las
-        const imagens = req.files.map((file, index) => {
-            const newFileName = `imagem-${index + 1}${path.extname(file.originalname)}`; // Renomeia como imagem-1, imagem-2, etc.
-            const newFilePath = path.join(contentDir, newFileName);
-            fs.renameSync(file.path, newFilePath);
-            return newFileName; // Armazena apenas o novo nome
-        });
+        // Processar demais imagens
+        const imagensBase64 = req.files.imagens
+            ? req.files.imagens.map(file => {
+                const imageBuffer = file.buffer;  // Pega o buffer da imagem da memória
+                return imageBuffer.toString('base64');  // Converte para base64
+            })
+            : [];
 
-
-        // Dados do jogo
-        const jogo = {
-            id: this.lastID,
-            titulo: nome,
-            ano,
-            plataformas,
-            categorias,
-            desenvolvedores,
-            descricao,
-            links: linksExternos,
-            imagens,
-            slug
-        };
-
-        // Gerar a página HTML usando o template.ejs
-        const templatePath = path.join(__dirname, 'views', 'template.ejs');
-        const htmlContent = ejs.render(fs.readFileSync(templatePath, 'utf-8'), { 
-            jogo, 
-            path: require('path') // Adicione esta linha
-        });
-        
-        // Salvar a página HTML na pasta do jogo
-        const htmlFilePath = path.join(__dirname, 'public', 'jogos', `${slug}.html`);
-        fs.writeFileSync(htmlFilePath, htmlContent);
+        // A imagem de capa fica no índice 0
+        imagensBase64.unshift(capaBase64);
 
         // Obter a data e hora atual para data_criacao e data_modificacao
         const dataAtual = new Date().toISOString();
@@ -319,20 +279,20 @@ app.post('/adicionarjogo', upload.array('imagens'), (req, res) => {
         // Salvar as informações no banco de dados
         db.run(
             `INSERT INTO jogo (nome, ano, plataformas, categorias, desenvolvedores, descricao, links, imagens, slug, data_criacao, data_modificacao) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
-                nome, 
-                ano, 
-                JSON.stringify(plataformas), 
-                JSON.stringify(categorias), 
-                JSON.stringify(desenvolvedores), 
-                descricao, 
-                JSON.stringify(linksExternos), 
-                JSON.stringify(imagens), 
-                slug, 
-                dataAtual, 
+                nome,
+                ano,
+                JSON.stringify(plataformas),
+                JSON.stringify(categorias),
+                JSON.stringify(desenvolvedores),
+                descricao,
+                JSON.stringify(linksExternos),
+                JSON.stringify(imagensBase64),  // Agora as imagens incluem a capa no índice 0
+                slug,
+                dataAtual,
                 dataAtual
-            ], 
+            ],
             (err) => {
                 if (err) {
                     console.error(err);
@@ -345,8 +305,37 @@ app.post('/adicionarjogo', upload.array('imagens'), (req, res) => {
         console.error(error);
         res.status(500).json({ success: false, message: 'Erro ao adicionar o jogo' });
     }
-    
+});
 
+app.get('/jogos/:slug', (req, res) => {
+    const slug = req.params.slug;
+
+    // Buscar o jogo no banco de dados
+    db.get('SELECT * FROM jogo WHERE slug = ?', [slug], (err, jogo) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).send('Erro ao buscar o jogo');
+        }
+
+        if (!jogo) {
+            return res.status(404).send('Jogo não encontrado');
+        }
+
+        // Renderizar o template EJS com os dados do jogo
+        res.render('template', {
+            jogo: {
+                nome: jogo.nome,
+                ano: jogo.ano,
+                plataformas: JSON.parse(jogo.plataformas),
+                categorias: JSON.parse(jogo.categorias),
+                desenvolvedores: JSON.parse(jogo.desenvolvedores),
+                descricao: jogo.descricao,
+                links: JSON.parse(jogo.links),
+                imagens: JSON.parse(jogo.imagens),
+                slug: jogo.slug
+            }
+        });
+    });
 });
 
 app.get('/admin/jogos/editar/:slug', isAuthenticated, (req, res) => {
@@ -364,6 +353,10 @@ app.get('/admin/jogos/editar/:slug', isAuthenticated, (req, res) => {
         jogo.links = jogo.links ? JSON.parse(jogo.links) : [];
         jogo.imagens = jogo.imagens ? JSON.parse(jogo.imagens) : [];
 
+        // Carregue a imagem de capa e as outras imagens
+        const imagemCapa = jogo.imagens[0] || null; // Imagem de capa
+        const outrasImagens = jogo.imagens.slice(1); // Outras imagens
+
         // Carregue as listas de plataformas, categorias e desenvolvedores
         db.all("SELECT nome FROM plataforma", (err, plataformas) => {
             if (err) {
@@ -377,153 +370,124 @@ app.get('/admin/jogos/editar/:slug', isAuthenticated, (req, res) => {
                     if (err) {
                         return res.status(500).send('Erro ao carregar os desenvolvedores');
                     }
-                    res.render('editar-jogo', { jogo, plataformas, categorias, desenvolvedores });
+                    // Renderize a página com as novas variáveis
+                    res.render('editar-jogo', {
+                        jogo: {
+                            ...jogo,
+                            imagemCapa: imagemCapa,
+                            outrasImagens: outrasImagens // Certifique-se de passar aqui
+                        },
+                        plataformas,
+                        categorias,
+                        desenvolvedores
+                    });
                 });
             });
         });
     });
 });
 
-
-app.post('/editar-jogo/:slug', upload.array('imagens'), (req, res) => {
+app.post('/editar-jogo/:slug', upload.fields([{ name: 'imagemCapa', maxCount: 1 }, { name: 'imagens' }]), (req, res) => {
     const slug = req.params.slug;
+    const removedImages = req.body.removedImages ? JSON.parse(req.body.removedImages) : [];
+    const removedCapa = req.body.removedCapa === 'true'; // Verifica se a capa foi sinalizada para remoção
 
-    db.get("SELECT * FROM jogo WHERE slug = ?", [slug], (err, jogoAntigo) => {
-        if (err || !jogoAntigo) {
+    db.get("SELECT * FROM jogo WHERE slug = ?", [slug], (err, jogo) => {
+        if (err || !jogo) {
             return res.status(404).send('Jogo não encontrado');
         }
 
         try {
-            const { nome, ano, plataforma, categoria, desenvolvedor, descricao, linkTitle, linkURL, imagensRemovidas } = req.body;
+            const { nome, ano, plataforma, categoria, desenvolvedor, descricao, linkTitle, linkURL } = req.body;
 
-            // Se os campos não foram enviados ou estão vazios, mantemos os valores antigos.
-            const novoNome = nome || jogoAntigo.nome;
-            const novoAno = ano || jogoAntigo.ano;
-            const novaDescricao = descricao || jogoAntigo.descricao;
+            const novoNome = nome || jogo.nome;
+            const novoAno = ano || jogo.ano;
+            const novaDescricao = descricao || jogo.descricao;
 
-            // Manter as plataformas, categorias e desenvolvedores, e combinar com os novos valores
-            const plataformasAntigas = JSON.parse(jogoAntigo.plataformas);
+            const plataformasAntigas = jogo.plataformas ? JSON.parse(jogo.plataformas) : [];
             const plataformasNovas = plataforma ? (Array.isArray(plataforma) ? plataforma : [plataforma].filter(Boolean)) : [];
-            const plataformasCombinadas = [...plataformasAntigas, ...plataformasNovas]; // Combina as novas com as antigas
+            const plataformasCombinadas = [...new Set([...plataformasAntigas, ...plataformasNovas])];
 
-            const categoriasAntigas = JSON.parse(jogoAntigo.categorias);
+            const categoriasAntigas = jogo.categorias ? JSON.parse(jogo.categorias) : [];
             const categoriasNovas = categoria ? (Array.isArray(categoria) ? categoria : [categoria].filter(Boolean)) : [];
-            const categoriasCombinadas = [...categoriasAntigas, ...categoriasNovas];
+            const categoriasCombinadas = [...new Set([...categoriasAntigas, ...categoriasNovas])];
 
-            const desenvolvedoresAntigos = JSON.parse(jogoAntigo.desenvolvedores);
+            const desenvolvedoresAntigos = jogo.desenvolvedores ? JSON.parse(jogo.desenvolvedores) : [];
             const desenvolvedoresNovos = desenvolvedor ? (Array.isArray(desenvolvedor) ? desenvolvedor : [desenvolvedor].filter(Boolean)) : [];
-            const desenvolvedoresCombinados = [...desenvolvedoresAntigos, ...desenvolvedoresNovos];
+            const desenvolvedoresCombinados = [...new Set([...desenvolvedoresAntigos, ...desenvolvedoresNovos])];
 
-            // Links externos
-            let linksExternos = [];
-            if (Array.isArray(linkTitle) && Array.isArray(linkURL)) {
-                // Se ambos são arrays, mapear normalmente
-                linksExternos = linkTitle.map((titulo, index) => ({ title: titulo, url: linkURL[index] }));
-            } else if (linkTitle && linkURL) {
-                // Se existe apenas um link (string única), transforma em um array de objeto
-                linksExternos = [{ title: linkTitle, url: linkURL }];
-            } else {
-                // Se os links não foram alterados, mantém os existentes
-                linksExternos = JSON.parse(jogoAntigo.links);
+            let linksExternos = Array.isArray(linkTitle) && Array.isArray(linkURL)
+                ? linkTitle.map((titulo, index) => ({ title: titulo, url: linkURL[index] }))
+                : linkTitle && linkURL
+                    ? [{ title: linkTitle, url: linkURL }]
+                    : jogo.links ? JSON.parse(jogo.links) : [];
+
+            let capaBase64 = jogo.imagens ? JSON.parse(jogo.imagens)[0] : null;
+            let imagensAntigas = jogo.imagens ? JSON.parse(jogo.imagens).slice(1) : []; // Remove a capa para lidar apenas com as outras imagens
+
+            // Se a capa foi sinalizada para remoção
+            if (removedCapa) {
+                capaBase64 = null; // Remover a capa
             }
 
-            // Gerar o novo slug
+            // Processar a nova imagem de capa, se houver
+            if (req.files.imagemCapa && req.files.imagemCapa[0]) {
+                const capaBuffer = req.files.imagemCapa[0].buffer;
+                capaBase64 = capaBuffer.toString('base64'); // Atualiza a capa com a nova imagem
+            }
+
+            // **Remover as imagens excluídas**
+            imagensAntigas = imagensAntigas.filter(img => !removedImages.includes(img));
+
+            // **Adicionar novas imagens**
+            const imagensNovas = req.files.imagens ? req.files.imagens.map(file => file.buffer.toString('base64')) : [];
+
+            // **Organizar a lista de imagens**
+            // A primeira imagem sempre deve ser a capa, e remover qualquer `null` que possa estar na lista
+            const todasImagens = [capaBase64, ...imagensAntigas, ...imagensNovas].filter(Boolean);
+
             const novoSlug = slugify(novoNome, { lower: true });
-            const novoContentDir = path.join(__dirname, 'public', 'uploads', novoSlug);
-            const antigoContentDir = path.join(__dirname, 'public', 'uploads', slug);
-
-            // Se o nome mudou, renomeia a pasta de imagens
-            if (novoSlug !== slug) {
-                if (fs.existsSync(antigoContentDir)) {
-                    fs.renameSync(antigoContentDir, novoContentDir);
-                }
-            }
-
-            let novasImagens = [];
-            let imagensAlteradas = false;
-
-            // Se não houve alteração nas imagens, mantém as imagens existentes
-            let imagensFinal = JSON.parse(jogoAntigo.imagens);
-
-            // Excluir imagens removidas
-            if (imagensRemovidas) {
-                const imagensParaRemover = JSON.parse(imagensRemovidas);
-                imagensParaRemover.forEach(imagem => {
-                    const filePath = path.join(novoContentDir, imagem);
-                    if (fs.existsSync(filePath)) {
-                        fs.unlinkSync(filePath);
-                    }
-                });
-                imagensFinal = imagensFinal.filter(imagem => !imagensParaRemover.includes(imagem));
-                imagensAlteradas = true; // Sinaliza que houve uma exclusão de imagens
-            }
-
-            // Verifica quantas imagens já existem e define o índice inicial para as novas imagens
-            let indiceInicial = imagensFinal.length;
-
-            // Verifica se existem novas imagens para adicionar
-            if (req.files.length > 0) {
-                novasImagens = req.files.map((file, index) => {
-                    const newFileName = `imagem-${indiceInicial + index + 1}${path.extname(file.originalname)}`;
-                    const newFilePath = path.join(novoContentDir, newFileName);
-                    fs.renameSync(file.path, newFilePath);
-                    return newFileName;
-                });
-                imagensAlteradas = true; // Sinaliza que houve uma inserção de imagens
-            }
-
-            if (imagensAlteradas) {
-                // Combina as novas imagens com as existentes
-                imagensFinal = [...imagensFinal, ...novasImagens].filter(Boolean);
-            }
-
-            // Atualizar o jogo no banco de dados
             const dataAtual = new Date().toISOString();
+
             db.run(
-                `UPDATE jogo SET nome = ?, ano = ?, plataformas = ?, categorias = ?, desenvolvedores = ?, descricao = ?, links = ?, imagens = ?, slug = ?, data_modificacao = ? WHERE slug = ?`, 
+                `UPDATE jogo SET nome = ?, ano = ?, plataformas = ?, categorias = ?, desenvolvedores = ?, descricao = ?, links = ?, imagens = ?, slug = ?, data_modificacao = ? WHERE slug = ?`,
                 [
-                    novoNome, 
-                    novoAno, 
-                    JSON.stringify(plataformasCombinadas),  // Usar as plataformas combinadas
-                    JSON.stringify(categoriasCombinadas),  // Usar as categorias combinadas
-                    JSON.stringify(desenvolvedoresCombinados),  // Usar os desenvolvedores combinados
-                    novaDescricao, 
-                    JSON.stringify(linksExternos), 
-                    JSON.stringify(imagensFinal), 
-                    novoSlug, 
+                    novoNome,
+                    novoAno,
+                    JSON.stringify(plataformasCombinadas),
+                    JSON.stringify(categoriasCombinadas),
+                    JSON.stringify(desenvolvedoresCombinados),
+                    novaDescricao,
+                    JSON.stringify(linksExternos),
+                    JSON.stringify(todasImagens),
+                    novoSlug,
                     dataAtual,
                     slug
-                ], 
+                ],
                 (err) => {
                     if (err) {
                         console.error(err);
                         return res.status(500).json({ success: false, message: 'Erro ao atualizar o jogo no banco de dados' });
                     }
 
-                    // Se o nome do jogo mudou, remove a página HTML antiga
-                    const antigoHtmlFilePath = path.join(__dirname, 'public', 'jogos', `${slug}.html`);
-                    if (fs.existsSync(antigoHtmlFilePath)) {
-                        fs.unlinkSync(antigoHtmlFilePath);
-                    }
-
-                    // Criar nova página HTML
-                    const templatePath = path.join(__dirname, 'views', 'template.ejs');
-                    const novoHtmlContent = ejs.render(fs.readFileSync(templatePath, 'utf-8'), { 
-                        jogo: { ...jogoAntigo, nome: novoNome, ano: novoAno, descricao: novaDescricao, plataformas: plataformasCombinadas, categorias: categoriasCombinadas, desenvolvedores: desenvolvedoresCombinados, slug: novoSlug, imagens: imagensFinal, links: linksExternos }, 
-                        path: require('path') 
-                    });
-                    const novoHtmlFilePath = path.join(__dirname, 'public', 'jogos', `${novoSlug}.html`);
-                    fs.writeFileSync(novoHtmlFilePath, novoHtmlContent);
-
-                    res.redirect('/admin'); // Redirecionar para a página de administração
+                    res.redirect('/admin'); 
                 }
             );
         } catch (error) {
             console.error(error);
-            res.status(500).json({ success: false, message: 'Erro ao editar o jogo' });
+            res.status(500).json({ success: false, message: 'Erro ao processar a edição do jogo' });
         }
     });
 });
+
+
+
+
+
+
+
+
+
 
 // Inicialização do servidor
 const PORT = process.env.PORT || 3000;

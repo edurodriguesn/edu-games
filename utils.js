@@ -117,13 +117,25 @@ function addLinkField() {
     container.appendChild(linkContainer);
 }
 
+let removedImages = [];
+
+function removeImage(imageContainer, imageBase64) {
+    // Adicionar a imagem removida ao array de imagens a serem excluídas
+    removedImages.push(imageBase64);
+    document.getElementById('removedImages').value = JSON.stringify(removedImages);
+
+    // Remover visualmente a imagem do front-end
+    const container = document.getElementById('image-fields');
+    container.removeChild(imageContainer);
+}
+
 function addImageField() {
     const container = document.getElementById('image-fields');
-
     const imageFieldContainer = document.createElement('div');
-    imageFieldContainer.className = 'p-2 mt-2 w-auto';
+    imageFieldContainer.className = 'p-2 mt-2 w-auto border rounded p-2 mr-1 image-container';
 
     const fileContainer = document.createElement('div');
+    fileContainer.className = 'flex items-center';
 
     const newImageField = document.createElement('input');
     newImageField.type = 'file';
@@ -131,15 +143,56 @@ function addImageField() {
     newImageField.className = 'border rounded p-2 mr-1';
     newImageField.required = true;
 
-    const removeButton = createRemoveButton(container, imageFieldContainer);
+    newImageField.addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const imgElement = document.createElement('img');
+                imgElement.src = e.target.result;
+                imgElement.className = 'w-40 h-40 object-cover mt-2 mx-auto';
+                imageFieldContainer.appendChild(imgElement);
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    const removeButton = document.createElement('button');
+    removeButton.type = 'button';
+    removeButton.className = 'bg-red-500 text-white p-2 rounded';
+    removeButton.innerText = 'X';
+    removeButton.onclick = function() {
+        removeImage(imageFieldContainer); // Chama a função de remoção
+    };
 
     fileContainer.appendChild(newImageField);
     fileContainer.appendChild(removeButton);
-
     imageFieldContainer.appendChild(fileContainer);
     container.appendChild(imageFieldContainer);
 }
+
 window.onload = function() {
     const descricao = document.getElementById('descricao');
     autoResize(descricao);
-};
+}; //carregar automaticamente a altura do campo de descricao na edição
+
+document.querySelectorAll('.game-card').forEach(card => {
+    const images = JSON.parse(card.getAttribute('data-images'));
+    let currentIndex = 0;
+    let interval;
+
+    card.addEventListener('mouseenter', () => {
+        interval = setInterval(() => {
+            currentIndex = (currentIndex + 1) % images.length; // Loop pelas imagens
+            const imgElement = card.querySelector('img');
+            imgElement.src = `data:image/jpeg;base64,${images[currentIndex]}`;
+        }, 1000); // Troca a cada 1 segundo
+    });
+
+    card.addEventListener('mouseleave', () => {
+        clearInterval(interval); // Para o loop ao sair do mouse
+        currentIndex = 0; // Reseta o índice se desejado
+        const imgElement = card.querySelector('img');
+        imgElement.src = `data:image/jpeg;base64,${images[currentIndex]}`; // Retorna à primeira imagem
+    });
+}); //Faz com que as imagens sejam trocadas automaticamente na página inicial

@@ -12,8 +12,16 @@
     </header>
     
     <main class="mx-auto w-[65%] py-6 px-20 my-8 bg-white shadow-lg rounded-lg overflow-hidden">
+
+        <!-- Adicionando a imagem de capa -->
+        <% if (jogo.imagens && jogo.imagens.length > 0) { %>
+            <div class="w-full mb-8">
+                <img src="data:image/jpeg;base64,<%= jogo.imagens[0] %>" alt="Capa do Jogo" class="w-full h-96 object-cover rounded-lg shadow-md">
+            </div>
+        <% } %>
+
         <div class="p-6">
-            <h1 class="text-5xl font-bold mb-4 text-center text-gray-800"><%= jogo.titulo %></h1>
+            <h1 class="text-5xl font-bold mb-4 text-center text-gray-800"><%= jogo.nome %></h1>
         </div>
         
         <div class="p-6 mx-auto rounded-lg bg-blue-50 shadow-md w-2/3 text-lg">
@@ -26,7 +34,6 @@
         <div class="p-6">
             <p class="text-gray-700 mb-4 text-xl"><%- jogo.descricao.replace(/\n/g, '<br>') %></p>
         
-
             <% if (jogo.links && jogo.links.length > 0) { %>
                 <div class="mb-4">
                     <h2 class="text-3xl font-bold mb-4">Links Externos</h2>
@@ -40,14 +47,15 @@
                     </div>
                 </div>
             <% } %>
-                
+        </div>
 
-        <% if (jogo.imagens && jogo.imagens.length > 0) { %>
+        <!-- Renderizando screenshots -->
+        <% if (jogo.imagens && jogo.imagens.length > 1) { %>
             <div class="p-6 bg-gray-50">
                 <h2 class="text-3xl font-bold mb-2">Screenshots</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <% jogo.imagens.forEach((imagem, index) => { %>
-                        <img src="/uploads/<%= jogo.slug %>/imagem-<%= index + 1 %><%= path.extname(imagem) %>" 
+                    <% jogo.imagens.slice(1).forEach((imagemBase64, index) => { %>
+                        <img src="data:image/jpeg;base64,<%= imagemBase64 %>" 
                              alt="imagem-<%= index + 1 %>" class="w-full h-64 object-cover rounded-lg shadow-md">
                     <% }) %>
                 </div>

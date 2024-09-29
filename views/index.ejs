@@ -88,62 +88,26 @@
                 <h1 class="text-2xl font-bold mb-4">Galeria de Jogos</h1>
                 <div class="grid grid-cols-3 gap-4">
                     <% jogos.forEach(function(jogo) { %>
-                    <div class="game-card max-w-xs bg-white shadow-lg rounded-lg overflow-hidden relative">
-                        <a href="/jogos/<%= jogo.slug %>.html">
-                            <div class="relative group game-card">
-                                <img class="w-full h-48 object-cover" src="/uploads/<%= jogo.slug %>/imagem-1.jpg" alt="<%= jogo.titulo %>"> <!-- Primeira Imagem -->
-                            </div>
-                            
-                            <script>
-                                document.addEventListener('DOMContentLoaded', function() {
-                                    const cards = document.querySelectorAll('.game-card');
-                            
-                                    cards.forEach(card => {
-                                        let imageIndex = 1; // Começa a partir da imagem-1
-                                        const slug = '<%= jogo.slug %>';
-                                        const baseUrl = '/uploads/' + slug + '/imagem-';
-                                        const fileExtension = '.jpg';
-                                        let interval;
-                            
-                                        function checkImageExists(index) {
-                                            return fetch(`/check-image?slug=${slug}&imageName=imagem-${index}${fileExtension}`)
-                                                .then(response => response.ok);
-                                        }
-                            
-                                        function startImageRotation() {
-                                            interval = setInterval(() => {
-                                                checkImageExists(imageIndex)
-                                                    .then(exists => {
-                                                        if (exists) {
-                                                            card.querySelector('img').src = baseUrl + imageIndex + fileExtension;
-                                                            imageIndex = (imageIndex % 20) + 1;
-                                                        } else {
-                                                            imageIndex = 1; // Volta para a primeira imagem se a imagem não existir
-                                                        }
-                                                    });
-                                            }, 1000);//Delay de 1s por imagem
-                                        }
-                            
-                                        card.addEventListener('mouseenter', () => {
-                                            startImageRotation();
-                                        });
-                            
-                                        card.addEventListener('mouseleave', () => {
-                                            clearInterval(interval);
-                                            card.querySelector('img').src = baseUrl + '1' + fileExtension; // Volta para a primeira imagem se tirar o mouse
-                                        });
-                                    });
-                                });
-                            </script>
-                                                                            
-                            <div class="p-4">
-                                <h2 class="text-lg font-bold"><%= jogo.nome %></h2>
-                            </div>
-                        </a>
-                        
-                        
-                    </div>
+                        <div class="game-card max-w-xs bg-white shadow-lg rounded-lg overflow-hidden relative" 
+                             data-images='<%= JSON.stringify(jogo.imagens) %>'>
+                            <a href="/jogos/<%= jogo.slug %>">
+                                <div class="relative group game-card">
+                                    <img class="w-full h-48 object-cover" 
+                                         src="data:image/jpeg;base64,<%= jogo.imagens[0] %>" 
+                                         alt="<%= jogo.nome %>" 
+                                         id="game-image-<%= jogo.slug %>">
+                                </div>
+                                <div class="p-4">
+                                    <h2 class="text-lg font-bold"><%= jogo.nome %></h2>
+                                </div>
+                            </a>
+                        </div>
                     <% }); %>
+                    
+                    
+                    
+                    
+                    
                 </div>
             </section>
         </main>
@@ -174,7 +138,6 @@
             </div>
         </div>
     </footer>
-    
-    
+    <script src="/utils.js"></script>
 </body>
 </html>

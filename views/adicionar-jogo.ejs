@@ -16,6 +16,13 @@
         
               
         <form action="/adicionarjogo" method="POST" enctype="multipart/form-data">
+            <div class="mb-4 flex justify-center">
+                <div class="w-full">
+                    <label for="imagemCapa" class="block text-sm font-medium text-gray-700 text-center">Imagem de Capa</label>
+                    <input type="file" id="imagemCapa" name="imagemCapa" class="border rounded p-2 w-full mt-2" accept="image/*" required>
+                </div>
+            </div>
+            
             <div class="mb-4 flex">
                 <div class="w-1/2 pr-2">
                     <label for="nome" class="block text-sm font-medium text-gray-700">Nome do Jogo</label>
