@@ -390,7 +390,10 @@ app.get('/admin/jogos/editar/:slug', isAuthenticated, (req, res) => {
 app.post('/editar-jogo/:slug', upload.fields([{ name: 'imagemCapa', maxCount: 1 }, { name: 'imagens' }]), (req, res) => {
     const slug = req.params.slug;
     const removedImages = req.body.removedImages ? JSON.parse(req.body.removedImages) : [];
-    const removedCapa = req.body.removedCapa === 'true'; // Verifica se a capa foi sinalizada para remoção
+    const removedPlataformas = req.body.removedPlataformas ? JSON.parse(req.body.removedPlataformas) : [];
+    const removedCategorias = req.body.removedCategorias ? JSON.parse(req.body.removedCategorias) : [];
+    const removedDesenvolvedores = req.body.removedDesenvolvedores ? JSON.parse(req.body.removedDesenvolvedores) : [];
+    const removedLinks = req.body.removedLinks ? JSON.parse(req.body.removedLinks) : [];
 
     db.get("SELECT * FROM jogo WHERE slug = ?", [slug], (err, jogo) => {
         if (err || !jogo) {
@@ -404,51 +407,55 @@ app.post('/editar-jogo/:slug', upload.fields([{ name: 'imagemCapa', maxCount: 1 
             const novoAno = ano || jogo.ano;
             const novaDescricao = descricao || jogo.descricao;
 
+            // Processamento de plataformas
             const plataformasAntigas = jogo.plataformas ? JSON.parse(jogo.plataformas) : [];
             const plataformasNovas = plataforma ? (Array.isArray(plataforma) ? plataforma : [plataforma].filter(Boolean)) : [];
-            const plataformasCombinadas = [...new Set([...plataformasAntigas, ...plataformasNovas])];
+            const plataformasCombinadas = [...new Set([...plataformasAntigas, ...plataformasNovas])]
+                                          .filter(plat => !removedPlataformas.includes(plat));
 
+            // Processamento de categorias
             const categoriasAntigas = jogo.categorias ? JSON.parse(jogo.categorias) : [];
             const categoriasNovas = categoria ? (Array.isArray(categoria) ? categoria : [categoria].filter(Boolean)) : [];
-            const categoriasCombinadas = [...new Set([...categoriasAntigas, ...categoriasNovas])];
+            const categoriasCombinadas = [...new Set([...categoriasAntigas, ...categoriasNovas])]
+                                          .filter(cat => !removedCategorias.includes(cat));
 
+            // Processamento de desenvolvedores
             const desenvolvedoresAntigos = jogo.desenvolvedores ? JSON.parse(jogo.desenvolvedores) : [];
             const desenvolvedoresNovos = desenvolvedor ? (Array.isArray(desenvolvedor) ? desenvolvedor : [desenvolvedor].filter(Boolean)) : [];
-            const desenvolvedoresCombinados = [...new Set([...desenvolvedoresAntigos, ...desenvolvedoresNovos])];
+            const desenvolvedoresCombinados = [...new Set([...desenvolvedoresAntigos, ...desenvolvedoresNovos])]
+                                               .filter(dev => !removedDesenvolvedores.includes(dev));
 
+            // Processamento de links
             let linksExternos = Array.isArray(linkTitle) && Array.isArray(linkURL)
                 ? linkTitle.map((titulo, index) => ({ title: titulo, url: linkURL[index] }))
                 : linkTitle && linkURL
                     ? [{ title: linkTitle, url: linkURL }]
                     : jogo.links ? JSON.parse(jogo.links) : [];
+            linksExternos = linksExternos.filter(link => !removedLinks.some(removedLink => removedLink.title === link.title && removedLink.url === link.url));
 
+            // Processamento de imagens
             let capaBase64 = jogo.imagens ? JSON.parse(jogo.imagens)[0] : null;
-            let imagensAntigas = jogo.imagens ? JSON.parse(jogo.imagens).slice(1) : []; // Remove a capa para lidar apenas com as outras imagens
+            let imagensAntigas = jogo.imagens ? JSON.parse(jogo.imagens).slice(1) : [];
 
-            // Se a capa foi sinalizada para remoção
-            if (removedCapa) {
-                capaBase64 = null; // Remover a capa
-            }
-
-            // Processar a nova imagem de capa, se houver
+            // Atualizar a imagem de capa, se houver uma nova
             if (req.files.imagemCapa && req.files.imagemCapa[0]) {
                 const capaBuffer = req.files.imagemCapa[0].buffer;
-                capaBase64 = capaBuffer.toString('base64'); // Atualiza a capa com a nova imagem
+                capaBase64 = capaBuffer.toString('base64');
             }
 
-            // **Remover as imagens excluídas**
+            // Remover as imagens excluídas
             imagensAntigas = imagensAntigas.filter(img => !removedImages.includes(img));
 
-            // **Adicionar novas imagens**
+            // Adicionar novas imagens
             const imagensNovas = req.files.imagens ? req.files.imagens.map(file => file.buffer.toString('base64')) : [];
 
-            // **Organizar a lista de imagens**
-            // A primeira imagem sempre deve ser a capa, e remover qualquer `null` que possa estar na lista
+            // Organizar a lista de imagens (primeira imagem sendo a capa)
             const todasImagens = [capaBase64, ...imagensAntigas, ...imagensNovas].filter(Boolean);
 
             const novoSlug = slugify(novoNome, { lower: true });
             const dataAtual = new Date().toISOString();
 
+            // Atualizar o banco de dados
             db.run(
                 `UPDATE jogo SET nome = ?, ano = ?, plataformas = ?, categorias = ?, desenvolvedores = ?, descricao = ?, links = ?, imagens = ?, slug = ?, data_modificacao = ? WHERE slug = ?`,
                 [
@@ -479,6 +486,7 @@ app.post('/editar-jogo/:slug', upload.fields([{ name: 'imagemCapa', maxCount: 1 
         }
     });
 });
+
 
 
 

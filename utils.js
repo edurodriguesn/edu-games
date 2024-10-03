@@ -117,16 +117,42 @@ function addLinkField() {
     container.appendChild(linkContainer);
 }
 
-let removedImages = [];
+let removedItems = {
+    images: [],
+    platforms: [],
+    categories: [],
+    developers: [],
+    links: []
+};
 
-function removeImage(imageContainer, imageBase64) {
-    // Adicionar a imagem removida ao array de imagens a serem excluídas
-    removedImages.push(imageBase64);
-    document.getElementById('removedImages').value = JSON.stringify(removedImages);
+function removeItem(type, container, itemValue) {
+    // Adiciona o item removido ao array correspondente no objeto removedItems
+    switch (type) {
+        case 'image-fields':
+            removedItems.images.push(itemValue);
+            document.getElementById('removedImages').value = JSON.stringify(removedItems.images);
+            break;
+        case 'plataformas-container':
+            removedItems.platforms.push(itemValue);
+            document.getElementById('removedPlataformas').value = JSON.stringify(removedItems.platforms);
+            break;
+        case 'categorias-container':
+            removedItems.categories.push(itemValue);
+            document.getElementById('removedCategorias').value = JSON.stringify(removedItems.categories);
+            break;
+        case 'desenvolvedores-container':
+            removedItems.developers.push(itemValue);
+            document.getElementById('removedDesenvolvedores').value = JSON.stringify(removedItems.developers);
+            break;
+        case 'link-fields':
+            removedItems.links.push(itemValue);
+            document.getElementById('removedLinks').value = JSON.stringify(removedItems.links);
+            break;
+    }
 
-    // Remover visualmente a imagem do front-end
-    const container = document.getElementById('image-fields');
-    container.removeChild(imageContainer);
+    // Remover visualmente o item do front-end
+    const parentContainer = document.getElementById(type);
+    parentContainer.removeChild(container);
 }
 
 function addImageField() {
@@ -150,7 +176,7 @@ function addImageField() {
             reader.onload = function(e) {
                 const imgElement = document.createElement('img');
                 imgElement.src = e.target.result;
-                imgElement.className = 'w-40 h-40 object-cover mt-2 mx-auto';
+                imgElement.className = 'w-80 h-60 object-cover rounded mt-2 mx-auto';
                 imageFieldContainer.appendChild(imgElement);
             };
             reader.readAsDataURL(file);
