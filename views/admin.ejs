@@ -7,11 +7,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100">
-    <div class="bg-white w-4/5 mx-auto shadow-lg my-6 rounded-lg overflow-hidden py-14 px-32">
-        <h1 class="text-2xl font-bold mb-4"><a href="/" class="hover:underline">Games Hub</a> - Administração de Jogos</h1>
-        <a href="/admin/jogos/adicionar" class="bg-blue-500 text-white rounded p-2 mb-4 inline-block">Adicionar Jogo</a>
+    <div class="w-4/5 mx-auto my-6 py-14 px-32 rounded-lg overflow-hidden bg-white shadow-lg">
+        <h1 class="mb-4 text-2xl font-bold"><a href="/" class="hover:underline">Games Hub</a> - Administração de Jogos</h1>
+        <a href="/admin/jogos/adicionar" class="inline-block p-2 mb-4 text-white rounded bg-blue-500">Adicionar Jogo</a>
     
-        <h2 class="text-xl font-bold mb-4">Jogos Cadastrados</h2>
+        <h2 class="mb-4 text-xl font-bold">Jogos Cadastrados</h2>
     
         <!-- Filtro de ordenação -->
         <form action="/admin/jogos" method="GET" class="mb-4">
@@ -20,10 +20,10 @@
                 <option value="data_criacao" <% if (sort === 'data_criacao') { %> selected <% } %>>Data de Criação</option>
                 <option value="data_modificacao" <% if (sort === 'data_modificacao') { %> selected <% } %>>Data de Modificação</option>
             </select>
-            <button type="submit" class="bg-blue-500 text-white rounded p-2 ml-2">Ordenar</button>
+            <button type="submit" class="p-2 ml-2 bg-blue-500 text-white rounded">Ordenar</button>
         </form>
     
-        <table class="w-full bg-white shadow-md rounded mb-4">
+        <table class="w-full mb-4 bg-white shadow-md rounded">
             <thead>
                 <tr>
                     <th class="border p-2 text-center">Nome</th>
@@ -39,9 +39,10 @@
                         <td class="border p-2 text-center"><%= new Date(jogo.data_criacao).toLocaleString() %></td>
                         <td class="border p-2 text-center"><%= new Date(jogo.data_modificacao).toLocaleString() %></td>
                         <td class="border p-2 text-center">
-                            <a href="/admin/jogos/editar/<%= jogo.slug%>" class="bg-yellow-500 text-white rounded p-2 inline-block">Editar</a>
+                            <a href="/admin/jogos/editar/<%= jogo.slug%>" class="inline-block p-2 text-white rounded bg-yellow-500
+                                ">Editar</a>
                             <form action="/admin/jogos/<%= jogo.id %>/delete" method="POST" class="inline">
-                                <button type="submit" class="bg-red-500 text-white rounded p-2 inline-block">Excluir</button>
+                                <button type="submit" class="inline-block p-2 bg-red-500 text-white rounded">Excluir</button>
                             </form>
                         </td>
                     </tr>

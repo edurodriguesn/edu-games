@@ -7,39 +7,42 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100">
-    <header class="bg-gradient-to-r from-blue-800 to-blue-500 text-white p-6 text-center shadow-lg">
-        <h1 class="text-3xl font-semibold"><a href="/" class="hover:underline">Games Hub</a> - Central de Jogos sobre Computação</h1>
+    <header class="p-6 text-center text-white bg-gradient-to-r from-blue-800 to-blue-500 shadow-lg">
+        <h1 class="text-3xl font-semibold">
+            <a href="/" class="hover:underline">Games Hub</a> - Central de Jogos sobre Computação
+        </h1>
     </header>
     
-    <main class="mx-auto w-[65%] py-6 px-20 my-8 bg-white shadow-lg rounded-lg overflow-hidden">
-
-        <!-- Adicionando a imagem de capa -->
+    <main class="w-[65%] py-6 px-20 my-8 mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
+    
+        <!-- Imagem de capa -->
         <% if (jogo.imagens && jogo.imagens.length > 0) { %>
-            <div class="w-full mb-8">
+            <div class="mb-8">
                 <img src="data:image/jpeg;base64,<%= jogo.imagens[0] %>" alt="Capa do Jogo" class="w-full h-96 object-cover rounded-lg shadow-md">
             </div>
         <% } %>
-
+    
         <div class="p-6">
-            <h1 class="text-5xl font-bold mb-4 text-center text-gray-800"><%= jogo.nome %></h1>
+            <h1 class="text-5xl font-bold text-center text-gray-800 mb-4"><%= jogo.nome %></h1>
         </div>
         
-        <div class="p-6 mx-auto rounded-lg bg-blue-50 shadow-md w-2/3 text-lg">
-            <p class="text-gray-700 mb-2"><strong>Ano de Lançamento:</strong> <%= jogo.ano %></p>
-            <p class="text-gray-700 mb-2"><strong>Plataforma:</strong> <%= Array.isArray(jogo.plataformas) ? jogo.plataformas.join(', ') : 'N/A' %></p>
-            <p class="text-gray-700 mb-2"><strong>Categoria:</strong> <%= Array.isArray(jogo.categorias) ? jogo.categorias.join(', ') : 'N/A' %></p>
-            <p class="text-gray-700 mb-4"><strong>Desenvolvedor:</strong> <%= Array.isArray(jogo.desenvolvedores) ? jogo.desenvolvedores.join(', ') : 'N/A' %></p>
+        <div class="w-2/3 p-6 mx-auto text-lg text-gray-700 bg-blue-50 rounded-lg shadow-md">
+            <p class="mb-2"><strong>Ano de Lançamento:</strong> <%= jogo.ano %></p>
+            <p class="mb-2"><strong>Plataforma:</strong> <%= Array.isArray(jogo.plataformas) ? jogo.plataformas.join(', ') : 'N/A' %></p>
+            <p class="mb-2"><strong>Categoria:</strong> <%= Array.isArray(jogo.categorias) ? jogo.categorias.join(', ') : 'N/A' %></p>
+            <p class="mb-4"><strong>Desenvolvedor:</strong> <%= Array.isArray(jogo.desenvolvedores) ? jogo.desenvolvedores.join(', ') : 'N/A' %></p>
         </div>
-        
+    
         <div class="p-6">
-            <p class="text-gray-700 mb-4 text-xl"><%- jogo.descricao.replace(/\n/g, '<br>') %></p>
-        
+            <p class="text-xl text-gray-700 mb-4"><%- jogo.descricao.replace(/\n/g, '<br>') %></p>
+    
+            <!-- Links Externos -->
             <% if (jogo.links && jogo.links.length > 0) { %>
                 <div class="mb-4">
                     <h2 class="text-3xl font-bold mb-4">Links Externos</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                         <% jogo.links.forEach(link => { %>
-                            <div class="p-4 bg-white shadow-md rounded-lg transition-transform transform hover:scale-105">
+                            <div class="p-4 bg-white shadow-md rounded-lg transform transition-transform hover:scale-105">
                                 <h3 class="text-xl font-semibold mb-2"><%= link.title %></h3>
                                 <a href="<%= link.url %>" class="text-blue-500 hover:underline" target="_blank">Visitar</a>
                             </div>
@@ -48,30 +51,29 @@
                 </div>
             <% } %>
         </div>
-
-        <!-- Renderizando screenshots -->
+    
+        <!-- Screenshots -->
         <% if (jogo.imagens && jogo.imagens.length > 1) { %>
             <div class="p-6 bg-gray-50">
                 <h2 class="text-3xl font-bold mb-2">Screenshots</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <% jogo.imagens.slice(1).forEach((imagemBase64, index) => { %>
-                        <img src="data:image/jpeg;base64,<%= imagemBase64 %>" 
-                             alt="imagem-<%= index + 1 %>" class="w-full h-64 object-cover rounded-lg shadow-md">
+                        <img src="data:image/jpeg;base64,<%= imagemBase64 %>" alt="imagem-<%= index + 1 %>" class="w-full h-64 object-cover rounded-lg shadow-md">
                     <% }) %>
                 </div>
             </div>
         <% } %>
     </main>
-
-    <footer class="bg-gradient-to-r from-blue-800 to-blue-500 text-white p-4">
+    
+    <footer class="p-4 text-white bg-gradient-to-r from-blue-800 to-blue-500">
         <div class="w-[65%] mx-auto flex items-center">
-            <div class="flex items-center justify-center">
+            <div class="flex justify-center items-center">
                 <a href="/" class="hover:underline">
                     <img src="../images/logo.png" alt="logo" class="w-32">
                 </a>
             </div>
     
-            <div class="flex flex-col justify-between w-full ml-4">
+            <div class="flex flex-col w-full ml-4">
                 <div class="flex justify-between mb-10">
                     <p>&copy; 2024 <a href="/" class="hover:underline">Games Hub</a>. Todos os direitos reservados.</p>
                     <div class="flex space-x-4">
@@ -88,6 +90,6 @@
                 </div>
             </div>
         </div>
-    </footer>
+    </footer>    
 </body>
 </html>

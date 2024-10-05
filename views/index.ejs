@@ -22,39 +22,39 @@
         <h1 class="text-3xl font-semibold"><a href="" class="hover:underline">Games Hub</a> 
             - Central de Jogos sobre Computação <a href="/admin" class="hover:underline">#</a></h1>
     </header>
-    <div class="mx-auto w-[65%] py-6 my-8 bg-white shadow-lg rounded-lg overflow-hidden">
-        <div class="flex flex-col items-center mb-6 p-4 w-3/4 mx-auto space-y-4">
+    <div class="w-[65%] py-6 my-8 mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
+        <div class="flex flex-col items-center w-3/4 mb-6 p-4 mx-auto space-y-4">
             <div> <a href="" class="hover:underline"><img src="images/logo.png" alt="logo" class="w-48"></a>  </div> <!-- Logo -->
         
             <div class="w-1/2">
                 <form action="/pesquisa" method="GET" class="flex">
                     <input type="text" id="pesquisa" name="pesquisa" placeholder="Pesquisar"
-                        class="bg-gray-200 text-gray-700 block w-full rounded-md shadow-sm p-2">
-                    <button class="btn bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-2">Buscar</button>
+                        class= "w-full p-2 bg-gray-200 text-gray-700 rounded-md shadow-sm block">
+                    <button class="ml-2 py-2 px-4 text-white font-bold bg-blue-500 hover:bg-blue-700 rounded">Buscar</button>
                 </form>
             </div>
             
             <div class="flex space-x-4 items-center"> <!-- Campo de Filtro -->
-                <div class="bg-gray-200 text-gray-700 py-2 px-4 rounded">
+                <div class="py-2 px-4 bg-gray-200 text-gray-700 rounded">
                     Filtrar por...
                 </div>
                 <form action="/filtrar" method="GET">
-                    <button name="plataforma" value="plataforma" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Plataforma</button>
+                    <button name="plataforma" value="plataforma" class="py-2 px-4 text-white font-bold bg-blue-500 hover:bg-blue-700 rounded">Plataforma</button>
                 </form>
                 <form action="/filtrar" method="GET">
-                    <button name="categoria" value="categoria" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Categoria</button>
+                    <button name="categoria" value="categoria" class="py-2 px-4 text-white font-bold bg-green-500 hover:bg-green-700 rounded">Categoria</button>
                 </form>
                 <form action="/filtrar" method="GET">
-                    <button name="desenvolvedor" value="desenvolvedor" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Desenvolvedor</button>
+                    <button name="desenvolvedor" value="desenvolvedor" class="py-2 px-4 text-white font-bold bg-red-500 hover:bg-red-700 rounded">Desenvolvedor</button>
                 </form>
             </div>
         </div>
         
-        <main class="p-4 w-4/5 mx-auto">
+        <main class="w-4/5 p-4 mx-auto">
             <section class="mb-8">
                 <h1 class="text-3xl text-center font-bold">Sobre o Projeto</h1>
                 <hr class="my-2">
-                <p class="text-gray-700 flex justify-between text-lg">
+                <p class="flex justify-between text-gray-700 text-lg">
                     Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eu felis malesuada, 
                     convallis eros quis, commodo quam. Mauris laoreet magna ipsum. Phasellus consequat dolor et 
                     lectus malesuada ullamcorper. Proin a pretium lacus, at ullamcorper lorem. Sed quis nibh ex. 
@@ -85,7 +85,7 @@
             </section>
 
             <section class="p-4 text-center"> <!-- Galeria de Jogos -->
-                <h1 class="text-2xl font-bold mb-4">Galeria de Jogos</h1>
+                <h1 class="mb-4 text-2xl font-bold">Galeria de Jogos</h1>
                 <div class="grid grid-cols-3 gap-4">
                     <% jogos.forEach(function(jogo) { %>
                         <div class="game-card max-w-xs bg-white shadow-lg rounded-lg overflow-hidden relative" 
@@ -112,8 +112,8 @@
             </section>
         </main>
     </div>
-    <footer class="bg-gradient-to-r from-blue-800 to-blue-500 text-white p-4">
-        <div class="w-[65%] mx-auto flex items-center">
+    <footer class="p-4 text-white bg-gradient-to-r from-blue-800 to-blue-500">
+        <div class="flex items-center w-[65%] mx-auto">
             <div class="flex items-center justify-center">
                 <a href="/" class="hover:underline">
                     <img src="../images/logo.png" alt="logo" class="w-32">
