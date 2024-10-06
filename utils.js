@@ -43,14 +43,14 @@ function addNewOption(selectId, inputId, containerId) {
         return;
     }
 
-    // Verifica duplicatas no select
+    //verifica duplicatas no select
     const select = document.getElementById(selectId);
     if (Array.from(select.options).some(option => option.value === newValue)) {
         alert('Essa característica já está disponível nas opções.');
         return;
     }
 
-    // Cria nova opção e envia ao servidor
+    //cria nova opção e envia ao servidor
     fetch('/add-option', {
         method: 'POST',
         headers: {
@@ -63,13 +63,13 @@ function addNewOption(selectId, inputId, containerId) {
             return;
         }
 
-        // Adiciona a nova opção no select
+        //adiciona a nova opção no select
         const newOption = document.createElement('option');
         newOption.value = newValue;
         newOption.text = newValue;
         select.add(newOption);
 
-        // Limpa o campo de texto
+        //limpa o campo de texto
         input.value = '';
         alert('Nova característica adicionada com sucesso.');
     });
@@ -84,9 +84,9 @@ function addTextField() {
 }
 
 function autoResize(textarea) {
-    // Reseta a altura para calcular corretamente a nova altura
+    //reseta a altura para calcular corretamente a nova altura
     textarea.style.height = 'auto';
-    // Define a altura com base no scrollHeight
+    //define a altura com base no scrollHeight
     textarea.style.height = textarea.scrollHeight + 'px';
 }
 
@@ -126,7 +126,7 @@ let removedItems = {
 };
 
 function removeItem(type, container, itemValue) {
-    // Adiciona o item removido ao array correspondente no objeto removedItems
+    //adiciona o item removido ao array correspondente no objeto removedItems
     switch (type) {
         case 'image-fields':
             removedItems.images.push(itemValue);
@@ -150,7 +150,7 @@ function removeItem(type, container, itemValue) {
             break;
     }
 
-    // Remover visualmente o item do front-end
+    //remover visualmente o item do front-end
     const parentContainer = document.getElementById(type);
     parentContainer.removeChild(container);
 }
@@ -188,7 +188,7 @@ function addImageField() {
     removeButton.className = 'bg-red-500 text-white p-2 rounded';
     removeButton.innerText = 'X';
     removeButton.onclick = function() {
-        removeImage(imageFieldContainer); // Chama a função de remoção
+        removeImage(imageFieldContainer); //chama a função de remoção
     };
 
     fileContainer.appendChild(newImageField);
@@ -209,16 +209,16 @@ document.querySelectorAll('.game-card').forEach(card => {
 
     card.addEventListener('mouseenter', () => {
         interval = setInterval(() => {
-            currentIndex = (currentIndex + 1) % images.length; // Loop pelas imagens
+            currentIndex = (currentIndex + 1) % images.length; //loop pelas imagens
             const imgElement = card.querySelector('img');
             imgElement.src = `data:image/jpeg;base64,${images[currentIndex]}`;
-        }, 1000); // Troca a cada 1 segundo
+        }, 1000); //troca a cada 1 segundo
     });
 
     card.addEventListener('mouseleave', () => {
-        clearInterval(interval); // Para o loop ao sair do mouse
-        currentIndex = 0; // Reseta o índice se desejado
+        clearInterval(interval); //para o loop ao sair do mouse
+        currentIndex = 0; //reseta o índice se desejado
         const imgElement = card.querySelector('img');
-        imgElement.src = `data:image/jpeg;base64,${images[currentIndex]}`; // Retorna à primeira imagem
+        imgElement.src = `data:image/jpeg;base64,${images[currentIndex]}`; //retorna à primeira imagem
     });
 }); //Faz com que as imagens sejam trocadas automaticamente na página inicial
