@@ -9,19 +9,11 @@ router.get('/', (req, res) => {
             throw err;
         }
         
-<<<<<<< HEAD
         //mapeia os resultados para incluir apenas os campos desejados
         const jogos = rows.map(row => ({
             nome: row.nome,
             slug: row.slug,
             imagens: JSON.parse(row.imagens) //supondo que as imagens estejam em formato JSON
-=======
-        // Mapeia os resultados para incluir apenas os campos desejados
-        const jogos = rows.map(row => ({
-            nome: row.nome,
-            slug: row.slug,
-            imagens: JSON.parse(row.imagens) // Supondo que as imagens estejam em formato JSON
->>>>>>> 6af0580dbd8d8a91935991d813e4ac762bd0fdbd
         }));
 
         res.render('index', { jogos });
@@ -32,11 +24,7 @@ router.get('/', (req, res) => {
 router.get('/jogos/:slug', (req, res) => {
     const slug = req.params.slug;
 
-<<<<<<< HEAD
     //buscar o jogo no banco de dados
-=======
-    // Buscar o jogo no banco de dados
->>>>>>> 6af0580dbd8d8a91935991d813e4ac762bd0fdbd
     db.get('SELECT * FROM jogo WHERE slug = ?', [slug], (err, jogo) => {
         if (err) {
             console.error(err);
@@ -47,11 +35,7 @@ router.get('/jogos/:slug', (req, res) => {
             return res.status(404).send('Jogo não encontrado');
         }
 
-<<<<<<< HEAD
         //renderizar o template EJS com os dados do jogo
-=======
-        // Renderizar o template EJS com os dados do jogo
->>>>>>> 6af0580dbd8d8a91935991d813e4ac762bd0fdbd
         res.render('template', {
             jogo: {
                 nome: jogo.nome,
