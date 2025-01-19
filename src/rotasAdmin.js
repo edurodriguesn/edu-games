@@ -62,23 +62,24 @@ router.post('/add-option', (req, res) => {
     }
 
     //verifica se a opção já existe antes de adicionar
-    db.get(`SELECT * FROM ${tableName} WHERE nome = ?`, [nome], (err, row) => {
+    db.get(`SELECT * FROM caracteristica WHERE tipo = ? AND nome = ?`, [tableName, nome], (err, row) => {
         if (err) {
             return res.status(500).json({ success: false, message: 'Erro ao verificar a opção existente' });
         }
-
+    
         if (row) {
             return res.status(400).json({ success: false, message: 'A opção já existe' });
         }
-
-        //adiciona a nova opção se não existir
-        db.run(`INSERT INTO ${tableName} (nome) VALUES (?)`, [nome], (err) => {
+    
+        // Adiciona a nova opção se não existir
+        db.run(`INSERT INTO caracteristica (tipo, nome) VALUES (?, ?)`, [tableName, nome], (err) => {
             if (err) {
                 return res.status(500).json({ success: false, message: 'Erro ao adicionar a nova opção' });
             }
             res.status(200).json({ success: true, message: 'Opção adicionada com sucesso' });
         });
     });
+    
 });
 
 module.exports = router;

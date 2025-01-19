@@ -7,22 +7,26 @@ const upload = require('./upload');
 
 // rota para renderizar a página de criação de novo jogo:
 router.get('/admin/jogos/adicionar', usuarioAutenticado, (req, res) => {
-    db.all("SELECT nome FROM plataforma", (err, plataformas) => {
+    db.all("SELECT nome FROM caracteristica WHERE tipo = 'plataforma'", (err, plataformas) => {
         if (err) {
-            return res.status(500).send('Erro ao carregar as plataformas');
+            plataformas = [];
         }
-        db.all("SELECT nome FROM categoria", (err, categorias) => {
+    
+        db.all("SELECT nome FROM caracteristica WHERE tipo = 'categoria'", (err, categorias) => {
             if (err) {
-                return res.status(500).send('Erro ao carregar as categorias');
+                categorias = [];
             }
-            db.all("SELECT nome FROM desenvolvedor", (err, desenvolvedores) => {
+    
+            db.all("SELECT nome FROM caracteristica WHERE tipo = 'desenvolvedor'", (err, desenvolvedores) => {
                 if (err) {
-                    return res.status(500).send('Erro ao carregar os desenvolvedores');
+                    desenvolvedores = [];
                 }
+                // Renderiza a página com as listas (vazias ou preenchidas)
                 res.render('adicionar-jogo', { plataformas, categorias, desenvolvedores });
             });
         });
     });
+    
 }); 
 
 //rota para adicionar jogo

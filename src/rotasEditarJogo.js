@@ -27,15 +27,15 @@ router.get('/admin/jogos/editar/:slug', usuarioAutenticado, (req, res) => {
         const outrasImagens = jogo.imagens.slice(1); //outras imagens
 
         //carregue as listas de plataformas, categorias e desenvolvedores
-        db.all("SELECT nome FROM plataforma", (err, plataformas) => {
+        db.all("SELECT nome FROM caracteristica where tipo = 'plataforma'", (err, plataformas) => {
             if (err) {
                 return res.status(500).send('Erro ao carregar as plataformas');
             }
-            db.all("SELECT nome FROM categoria", (err, categorias) => {
+            db.all("SELECT nome FROM caracteristica where tipo = 'categoria'", (err, categorias) => {
                 if (err) {
                     return res.status(500).send('Erro ao carregar as categorias');
                 }
-                db.all("SELECT nome FROM desenvolvedor", (err, desenvolvedores) => {
+                db.all("SELECT nome FROM caracteristica where tipo = 'desenvolvedor'", (err, desenvolvedores) => {
                     if (err) {
                         return res.status(500).send('Erro ao carregar os desenvolvedores');
                     }
