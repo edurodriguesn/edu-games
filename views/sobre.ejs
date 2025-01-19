@@ -8,9 +8,7 @@
 </head>
 <body class="flex flex-col min-h-screen bg-gray-100">
 
-    <header class="p-4 text-center text-white bg-blue-900">
-        <h1 class="text-2xl font-semibold"><a href="/" class="hover:underline">Games Hub</a> - Sobre Nós</h1>
-    </header>
+    <%- include('partials/cabecalho')%>
 
     <main class="flex-grow w-3/4 mx-auto my-8 py-6 px-32 rounded-lg bg-white shadow-lg">
         <section>
@@ -54,19 +52,7 @@
         </div>
     </main>
     
-
-    <footer class="p-4 mt-8 bg-blue-900 text-white">
-        <div class="w-3/4 mx-auto">
-            <div class="mt-4 text-center">
-                <p>&copy; 2024 <a href="/" class="hover:underline">Games Hub</a>. Todos os direitos reservados.</p>
-            </div>
-    
-            <div class="mt-4 text-center">
-                <p>Ciência da Computação | Universidade Federal do Amapá</p>
-                <p>Endereço: Rodovia Josmar Chaves Pinto - KM 02, 68903-419 - Macapá - AP</p>
-            </div>
-        </div>
-    </footer>
+    <%- include('partials/footer')%>
 
 </body>
 </html>

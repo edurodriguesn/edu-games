@@ -7,13 +7,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100">
-    <header class="p-6 text-center text-white bg-gradient-to-r from-blue-800 to-blue-500 shadow-lg">
-        <h1 class="text-3xl font-semibold">
-            <a href="/" class="hover:underline">Games Hub</a> - Central de Jogos sobre Computação
-        </h1>
-    </header>
+    <%- include('partials/cabecalho')%>
     
-    <main class="w-[65%] py-6 px-20 my-8 mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
+    <main class="w-[65%] py-6 px-24 my-8 mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
     
         <!-- Imagem de capa -->
         <% if (jogo.imagens && jogo.imagens.length > 0) { %>
@@ -64,32 +60,6 @@
             </div>
         <% } %>
     </main>
-    
-    <footer class="p-4 text-white bg-gradient-to-r from-blue-800 to-blue-500">
-        <div class="w-[65%] mx-auto flex items-center">
-            <div class="flex justify-center items-center">
-                <a href="/" class="hover:underline">
-                    <img src="../images/logo.png" alt="logo" class="w-32">
-                </a>
-            </div>
-    
-            <div class="flex flex-col w-full ml-4">
-                <div class="flex justify-between mb-10">
-                    <p>&copy; 2024 <a href="/" class="hover:underline">Games Hub</a>. Todos os direitos reservados.</p>
-                    <div class="flex space-x-4">
-                        <a href="/sobre" class="hover:underline">Sobre Nós</a>
-                        <a href="/contato" class="hover:underline">Contato</a>
-                        <a href="/politica-privacidade" class="hover:underline">Política de Privacidade</a>
-                        <a href="https://www2.unifap.br/ccomputacao/" class="hover:underline">Site do Curso</a>
-                    </div>
-                </div>
-    
-                <div class="mt-4 text-center text-gray-200">
-                    <p>Ciência da Computação | Universidade Federal do Amapá</p>
-                    <p>Endereço: Rodovia Josmar Chaves Pinto - KM 02, 68903-419 - Macapá - AP</p>
-                </div>
-            </div>
-        </div>
-    </footer>    
+    <%- include('partials/footer') %>
 </body>
 </html>
