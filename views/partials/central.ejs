@@ -1,0 +1,26 @@
+<div class="flex flex-col items-center w-3/4 mb-6 p-4 mx-auto space-y-4">
+    <div> <a href="" class="hover:underline"><img src="images/logo.png" alt="logo" class="w-48"></a>  </div> <!-- Logo -->
+
+    <div class="w-1/2">
+        <form action="/pesquisa" method="GET" class="flex">
+            <input type="text" id="pesquisa" name="pesquisa" placeholder="Pesquisar"
+                class= "w-full p-2 bg-gray-200 text-gray-700 rounded-md shadow-sm block">
+            <button class="ml-2 py-2 px-4 text-white font-bold bg-blue-500 hover:bg-blue-700 rounded">Buscar</button>
+        </form>
+    </div>
+    
+    <div class="flex space-x-4 items-center"> <!-- Campo de Filtro -->
+        <div class="py-2 px-4 bg-gray-200 text-gray-700 rounded">
+            Filtrar por...
+        </div>
+        <form action="/filtrar" method="GET">
+            <button name="plataforma" value="plataforma" class="py-2 px-4 text-white font-bold bg-blue-500 hover:bg-blue-700 rounded">Plataforma</button>
+        </form>
+        <form action="/filtrar" method="GET">
+            <button name="categoria" value="categoria" class="py-2 px-4 text-white font-bold bg-green-500 hover:bg-green-700 rounded">Categoria</button>
+        </form>
+        <form action="/filtrar" method="GET">
+            <button name="desenvolvedor" value="desenvolvedor" class="py-2 px-4 text-white font-bold bg-red-500 hover:bg-red-700 rounded">Desenvolvedor</button>
+        </form>
+    </div>
+</div>
