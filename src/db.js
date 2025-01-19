@@ -27,19 +27,10 @@ db.serialize(() => {
         data_criacao DATETIME DEFAULT CURRENT_TIMESTAMP,     -- Data de criação
         data_modificacao DATETIME DEFAULT CURRENT_TIMESTAMP  -- Data de modificação
     )`);
-
-    db.run(`CREATE TABLE IF NOT EXISTS plataforma (
+    
+    db.run(`CREATE TABLE IF NOT EXISTS caracteristica (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        nome TEXT UNIQUE
-    )`);
-
-    db.run(`CREATE TABLE IF NOT EXISTS categoria (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        nome TEXT UNIQUE
-    )`);
-
-    db.run(`CREATE TABLE IF NOT EXISTS desenvolvedor (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        tipo TEXT,
         nome TEXT UNIQUE
     )`);
 });
