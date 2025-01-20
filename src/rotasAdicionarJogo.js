@@ -71,7 +71,7 @@ router.post('/admin/jogos/adicionar', upload.fields([{ name: 'imagemCapa', maxCo
 
         //salvar as informações no banco de dados
         db.run(
-            `INSERT INTO jogo (nome, ano, plataformas, categorias, desenvolvedores, descricao, links, imagens, slug, data_criacao, data_modificacao) 
+            `INSERT INTO jogo (nome, ano, plataforma, categoria, desenvolvedor, descricao, links, imagens, slug, data_criacao, data_modificacao) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
                 nome,

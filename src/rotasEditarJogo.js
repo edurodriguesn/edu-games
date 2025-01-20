@@ -16,9 +16,9 @@ router.get('/admin/jogos/editar/:slug', usuarioAutenticado, (req, res) => {
         }
 
         //certifique-se de que as propriedades sejam arrays
-        jogo.plataformas = jogo.plataformas ? JSON.parse(jogo.plataformas) : [];
-        jogo.categorias = jogo.categorias ? JSON.parse(jogo.categorias) : [];
-        jogo.desenvolvedores = jogo.desenvolvedores ? JSON.parse(jogo.desenvolvedores) : [];
+        jogo.plataforma = jogo.plataforma ? JSON.parse(jogo.plataforma) : [];
+        jogo.categoria = jogo.categoria ? JSON.parse(jogo.categoria) : [];
+        jogo.desenvolvedor = jogo.desenvolvedor ? JSON.parse(jogo.desenvolvedor) : [];
         jogo.links = jogo.links ? JSON.parse(jogo.links) : [];
         jogo.imagens = jogo.imagens ? JSON.parse(jogo.imagens) : [];
 
@@ -77,19 +77,19 @@ router.post('/editar-jogo/:slug', upload.fields([{ name: 'imagemCapa', maxCount:
             const novaDescricao = descricao || jogo.descricao;
 
             //processamento de plataformas
-            const plataformasAntigas = jogo.plataformas ? JSON.parse(jogo.plataformas) : [];
+            const plataformasAntigas = jogo.plataforma ? JSON.parse(jogo.plataforma) : [];
             const plataformasNovas = plataforma ? (Array.isArray(plataforma) ? plataforma : [plataforma].filter(Boolean)) : [];
             const plataformasCombinadas = [...new Set([...plataformasAntigas, ...plataformasNovas])]
                                           .filter(plat => !removedPlataformas.includes(plat));
 
             //processamento de categorias
-            const categoriasAntigas = jogo.categorias ? JSON.parse(jogo.categorias) : [];
+            const categoriasAntigas = jogo.categoria ? JSON.parse(jogo.categoria) : [];
             const categoriasNovas = categoria ? (Array.isArray(categoria) ? categoria : [categoria].filter(Boolean)) : [];
             const categoriasCombinadas = [...new Set([...categoriasAntigas, ...categoriasNovas])]
                                           .filter(cat => !removedCategorias.includes(cat));
 
             //processamento de desenvolvedores
-            const desenvolvedoresAntigos = jogo.desenvolvedores ? JSON.parse(jogo.desenvolvedores) : [];
+            const desenvolvedoresAntigos = jogo.desenvolvedor ? JSON.parse(jogo.desenvolvedor) : [];
             const desenvolvedoresNovos = desenvolvedor ? (Array.isArray(desenvolvedor) ? desenvolvedor : [desenvolvedor].filter(Boolean)) : [];
             const desenvolvedoresCombinados = [...new Set([...desenvolvedoresAntigos, ...desenvolvedoresNovos])]
                                                .filter(dev => !removedDesenvolvedores.includes(dev));
@@ -126,7 +126,7 @@ router.post('/editar-jogo/:slug', upload.fields([{ name: 'imagemCapa', maxCount:
 
             //atualizar o banco de dados
             db.run(
-                `UPDATE jogo SET nome = ?, ano = ?, plataformas = ?, categorias = ?, desenvolvedores = ?, descricao = ?, links = ?, imagens = ?, slug = ?, data_modificacao = ? WHERE slug = ?`,
+                `UPDATE jogo SET nome = ?, ano = ?, plataforma = ?, categoria = ?, desenvolvedor = ?, descricao = ?, links = ?, imagens = ?, slug = ?, data_modificacao = ? WHERE slug = ?`,
                 [
                     novoNome,
                     novoAno,
