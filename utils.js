@@ -183,13 +183,8 @@ function addImageField() {
         }
     });
 
-    const removeButton = document.createElement('button');
-    removeButton.type = 'button';
-    removeButton.className = 'bg-red-500 text-white p-2 rounded';
-    removeButton.innerText = 'X';
-    removeButton.onclick = function() {
-        removeImage(imageFieldContainer); //chama a função de remoção
-    };
+    // Usando a função createRemoveButton para criar o botão de remover
+    const removeButton = createRemoveButton(container, imageFieldContainer);
 
     fileContainer.appendChild(newImageField);
     fileContainer.appendChild(removeButton);
