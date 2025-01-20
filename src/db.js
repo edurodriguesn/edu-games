@@ -17,9 +17,9 @@ db.serialize(() => {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         nome TEXT NOT NULL,
         ano INTEGER,
-        plataformas TEXT,
-        categorias TEXT,
-        desenvolvedores TEXT,
+        plataforma TEXT,
+        categoria TEXT,
+        desenvolvedor TEXT,
         descricao TEXT,                                      -- Campo para descrição do jogo
         links TEXT,                                          -- Links externos (armazenado como JSON)
         imagens TEXT,                                        -- Imagens (armazenado como JSON)
@@ -31,7 +31,8 @@ db.serialize(() => {
     db.run(`CREATE TABLE IF NOT EXISTS caracteristica (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         tipo TEXT,
-        nome TEXT UNIQUE
+        nome TEXT UNIQUE,
+        slug TEXT UNIQUE
     )`);
 });
 
