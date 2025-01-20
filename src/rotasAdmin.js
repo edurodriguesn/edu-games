@@ -1,6 +1,7 @@
 const express = require('express'); //importa o módulo Express
 const router = express.Router(); //cria um objeto Router do Express, que permite definir rotas
 const db = require('./db'); //importa o módulo db (banco de dados)
+const slugify = require('slugify');
 const { usuarioAutenticado } = require('./rotasLogin'); //middleware de autenticação
 
 router.get('/admin', usuarioAutenticado, (req, res) => {
@@ -66,13 +67,13 @@ router.post('/add-option', (req, res) => {
         if (err) {
             return res.status(500).json({ success: false, message: 'Erro ao verificar a opção existente' });
         }
-    
+        
         if (row) {
             return res.status(400).json({ success: false, message: 'A opção já existe' });
         }
-    
+        const slug = slugify(nome, { lower: true });
         // Adiciona a nova opção se não existir
-        db.run(`INSERT INTO caracteristica (tipo, nome) VALUES (?, ?)`, [tableName, nome], (err) => {
+        db.run(`INSERT INTO caracteristica (tipo, nome, slug) VALUES (?, ?, ?)`, [tableName, nome, slug], (err) => {
             if (err) {
                 return res.status(500).json({ success: false, message: 'Erro ao adicionar a nova opção' });
             }
