@@ -48,14 +48,14 @@
                     <select id="plataforma" class="w-full p-2 border rounded">
                         <option value="">Selecione uma Plataforma</option>
                         <% plataformas.forEach(plataforma => { %>
-                            <option value="<%= plataforma.nome %>" <%= jogo.plataformas.includes(plataforma.nome) ? 'selected' : '' %>><%= plataforma.nome %></option>
+                            <option value="<%= plataforma.nome %>" <%= jogo.plataforma.includes(plataforma.nome) ? 'selected' : '' %>><%= plataforma.nome %></option>
                         <% }) %>
                     </select>
                     <button type="button" onclick="addOptionField('plataforma', 'plataformas-container')" class="p-2 mt-2 bg-blue-500 text-white rounded">Incluir</button>
                     <input type="text" id="newPlataforma" class="w-full p-2 mt-2 border rounded" placeholder="Nova Plataforma">
                     <button type="button" onclick="addNewOption('plataforma', 'newPlataforma', 'plataformas-container')" class="p-2 mt-2 bg-green-500 text-white rounded">Inserir Nova Plataforma</button>
                     <div id="plataformas-container" class="mt-2">
-                        <% jogo.plataformas.forEach(plataforma => { %>
+                        <% jogo.plataforma.forEach(plataforma => { %>
                             <div class="flex items-center mt-2">
                                 <input type="text" value="<%= plataforma %>" class="w-full p-2 border rounded" readonly>
                                 <button type="button" class="px-3 py-1 ml-2 bg-red-500 text-white font-bold rounded" onclick="removeItem('plataformas-container', this.parentNode, '<%= plataforma %>')">X</button>
@@ -71,14 +71,14 @@
                     <select id="categoria" class="w-full p-2 border rounded">
                         <option value="">Selecione uma Categoria</option>
                         <% categorias.forEach(categoria => { %>
-                            <option value="<%= categoria.nome %>" <%= jogo.categorias.includes(categoria.nome) ? 'selected' : '' %>><%= categoria.nome %></option>
+                            <option value="<%= categoria.nome %>" <%= jogo.categoria.includes(categoria.nome) ? 'selected' : '' %>><%= categoria.nome %></option>
                         <% }) %>
                     </select>
                     <button type="button" onclick="addOptionField('categoria', 'categorias-container')" class="p-2 mt-2 bg-blue-500 text-white rounded">Incluir</button>
                     <input type="text" id="newCategoria" class="w-full p-2 mt-2 border rounded" placeholder="Nova Categoria">
                     <button type="button" onclick="addNewOption('categoria', 'newCategoria', 'categorias-container')" class="p-2 mt-2 bg-green-500 text-white rounded">Inserir Nova Categoria</button>
                     <div id="categorias-container" class="mt-2">
-                        <% jogo.categorias.forEach(categoria => { %>
+                        <% jogo.categoria.forEach(categoria => { %>
                             <div class="flex items-center mt-2">
                                 <input type="text" value="<%= categoria %>" class="w-full p-2 border rounded" readonly>
                                 <button type="button" class="px-3 py-1 ml-2 bg-red-500 text-white font-bold rounded" onclick="removeItem('categorias-container', this.parentNode, '<%= categoria %>')">X</button>
@@ -94,14 +94,14 @@
                     <select id="desenvolvedor" class="w-full p-2 border rounded">
                         <option value="">Selecione um Desenvolvedor</option>
                         <% desenvolvedores.forEach(desenvolvedor => { %>
-                            <option value="<%= desenvolvedor.nome %>" <%= jogo.desenvolvedores.includes(desenvolvedor.nome) ? 'selected' : '' %>><%= desenvolvedor.nome %></option>
+                            <option value="<%= desenvolvedor.nome %>" <%= jogo.desenvolvedor.includes(desenvolvedor.nome) ? 'selected' : '' %>><%= desenvolvedor.nome %></option>
                         <% }) %>
                     </select>
                     <button type="button" onclick="addOptionField('desenvolvedor', 'desenvolvedores-container')" class="p-2 mt-2 bg-blue-500 text-white rounded">Incluir</button>
                     <input type="text" id="newDesenvolvedor" class="w-full p-2 mt-2 border rounded" placeholder="Novo Desenvolvedor">
                     <button type="button" onclick="addNewOption('desenvolvedor', 'newDesenvolvedor', 'desenvolvedores-container')" class="p-2 mt-2 bg-green-500 text-white rounded">Inserir Novo Desenvolvedor</button>
                     <div id="desenvolvedores-container" class="mt-2">
-                        <% jogo.desenvolvedores.forEach(desenvolvedor => { %>
+                        <% jogo.desenvolvedor.forEach(desenvolvedor => { %>
                             <div class="flex items-center mt-2">
                                 <input type="text" value="<%= desenvolvedor %>" class="w-full p-2 border rounded" readonly>
                                 <button type="button" class="px-3 py-1 ml-2 bg-red-500 text-white font-bold rounded" onclick="removeItem('desenvolvedores-container', this.parentNode, '<%= desenvolvedor %>')">X</button>
