@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GamesHub</title>
+    <link href="/views/styles.css" rel="stylesheet">
+    <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
+</head>
+<body class="bg-gray-100 flex flex-col min-h-screen"> <!-- Flexbox no body -->
+
+    <%- include('partials/cabecalho') %>
+
+    <main class="flex-grow w-3/4 mx-auto my-8 py-6 px-32 rounded-lg bg-white shadow-lg"> <!-- flex-grow para ocupar o restante da tela -->
+        <%- include('partials/central') %>
+
+        <section class="p-4 text-center"> 
+            <!-- Título da seção -->
+            <h1 class="mb-6 text-3xl font-semibold text-gray-800">Filtrar por <%= tipoCaracteristica %></h1>
+
+
+            <!-- Grid para os botões -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6"> 
+                <% caracteristicas.forEach(function(caracteristica) { %>
+                    <div class="game-card max-w-xs bg-white shadow-lg rounded-lg overflow-hidden relative">
+                        <a href="/filtrar/<%= caracteristica.tipo %>/<%= caracteristica.slug %>">
+                            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-lg w-full transition duration-300 ease-in-out transform hover:scale-105">
+                                <%= caracteristica.nome %>
+                            </button>
+                        </a>
+                    </div>
+                <% }); %>
+            </div>
+        </section>
+    </main>
+
+    <%- include('partials/footer') %> <!-- O footer sempre vai ficar no final da página -->
+
+    <script src="/utils.js"></script>
+</body>
+</html>

@@ -1,0 +1,45 @@
+<header class="bg-gradient-to-r from-blue-800 to-blue-500 text-white p-6 shadow-lg flex justify-center">
+    <!-- Div principal com largura de 65% -->
+    <div class="w-[65%] flex items-center relative">
+        <!-- Div da imagem -->
+        <div class="absolute left-0 hidden xl:block">
+            <a href="/" class="hover:underline">
+                <img src="/images/logo.png" alt="logo" class="w-28">
+            </a>
+        </div>
+        <!-- Div do conteúdo centralizado -->
+        <div class="mx-auto flex flex-col items-center space-y-4">
+            <!-- Título -->
+            <h1 class="text-3xl font-semibold text-center">
+                <a href="/" class="hover:underline">Games Hub</a> - Central de Jogos sobre Computação 
+                <a href="/admin" class="hover:underline">#</a>
+            </h1>
+            <!-- Botões de filtro -->
+            <div class="flex space-x-4 justify-center">
+                <div class="py-2 px-4 bg-gray-400 text-gray-900 rounded">
+                    Filtrar por...
+                </div>
+                <a href="/filtrar/conhecimento">
+                    <button class="py-2 px-4 text-red-500 font-bold bg-gray-100 hover:bg-gray-300 rounded">
+                        Conhecimento
+                    </button>
+                </a>
+                <a href="/filtrar/plataforma">
+                    <button class="py-2 px-4 text-blue-500  font-bold bg-gray-100 hover:bg-gray-300 rounded">
+                        Plataforma
+                    </button>
+                </a>
+                <a href="/filtrar/categoria">
+                    <button class="py-2 px-4 text-green-500 font-bold bg-gray-100 hover:bg-gray-300 rounded">
+                        Categoria
+                    </button>
+                </a>
+                <a href="/filtrar/idioma">
+                    <button class="py-2 px-4 text-yellow-500 font-bold bg-gray-100 hover:bg-gray-300 rounded">
+                        Idioma
+                    </button>
+                </a>
+            </div>
+        </div>
+    </div>
+</header>

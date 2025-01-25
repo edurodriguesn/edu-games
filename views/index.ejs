@@ -1,77 +1,90 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MyAbandonware</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>GamesHub</title>
+    <link href="/views/styles.css" rel="stylesheet">
+    <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
+    <style>
+        /* Adicionando a transição para hover */
+        .game-card img {
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        .game-card:hover img {
+            opacity: 0.7;
+        }
+    </style>
 </head>
 <body class="bg-gray-100">
 
-    <header class="bg-blue-900 text-white p-4 flex justify-between">
-        <div class="text-lg font-semibold">
-            My MyAbandonware - Download Old Video Games
-        </div>
-        <nav>
-            <ul class="flex space-x-4">
-                <li><a href="random.html" class="hover:underline">Aleatório</a></li>
-                <li><a href="favoritos.html" class="hover:underline">Favoritos</a></li>
-                <li><a href="ajuda.html" class="hover:underline">Ajuda</a></li>
-                <li><a href="contribuicao.html" class="hover:underline">Contribuir</a></li>
-                <li><a href="registro.html" class="hover:underline">Registrar</a></li>
-                <li><a href="\login" class="hover:underline">Login</a></li>
-            </ul>
-        </nav>
-    </header>
-
-    <div class="flex justify-between items-center p-4 border border-red-500">
-        <div class="w-1/4">
-            <img src="imagens/logo.png" alt="logo" class="w-24">
-        </div>
-        <div class="w-3/4">
-            <form>
-                <label for="pesquisa" class="block text-sm font-medium text-gray-700">Pesquisar</label>
-                <input type="text" id="pesquisa" name="pesquisa" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
-            </form>
-        </div>
-    </div>
-
-    <main class="p-4 border border-red-500">
-        <section class="mb-8">
-            <h1 class="text-2xl font-bold">Sobre o Projeto</h1>
-            <hr class="my-2">
-            <p class="text-gray-700">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-                Phasellus rutrum quis tortor et vestibulum. Pellentesque habitant 
-                morbi tristique senectus et netus et malesuada fames ac turpis egestas. 
-                Sed sit amet massa magna. Maecenas vulputate volutpat magna eget pulvinar. 
-                Morbi blandit quam nec metus semper varius eget ut lorem. Praesent rhoncus 
-                purus nec erat pretium, sit amet molestie felis bibendum. Nunc sodales 
-                magna tempus viverra lacinia. Nam at nisl ante. Morbi sit amet nulla vel 
-                ipsum porttitor cursus a quis orci. Mauris feugiat nulla eu arcu ornare, 
-                in scelerisque leo cursus. Aliquam erat volutpat. Nulla varius in odio 
-                at maximus. Nunc enim ante, mattis et efficitur eu, egestas ut sapien. 
-                In at laoreet ex. Nam maximus, ipsum sit amet pulvinar porta, massa 
-                magna euismod enim, eu lacinia dui mi at tellus. Pellentesque mi massa,
-                vestibulum non pretium vitae, imperdiet feugiat libero.
-            </p>
-        </section> 
-
-    <main class="p-4">
-        <h1 class="text-2xl font-bold mb-4">Galeria de Jogos</h1>
-        <div class="grid grid-cols-3 gap-4">
-            <% conteudos.forEach(function(conteudo) { %>
-            <a href="/jogos/<%=conteudo.slug %>.html"> 
-            <div class="max-w-xs bg-white shadow-lg rounded-lg overflow-hidden">
-                <img class="w-full h-48 object-cover" src="/uploads/<%= conteudo.imagem %>" alt="<%= conteudo.titulo %>">
-                <div class="p-4">
-                    <h2 class="text-lg font-bold"><%= conteudo.titulo %></h2>
-                </div>
-            </div>
-            </a>
-            <% }); %>
-        </div>      
+    <%- include('partials/cabecalho') %>
         
+    <main class="w-[65%] py-6 px-24 my-8 mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
+        <%- include('partials/central') %>
+        <section class="mb-8">
+            <h1 class="text-3xl text-center font-bold">Sobre o Projeto</h1>
+            <hr class="my-2">
+            <p class="flex justify-between text-gray-700 text-lg">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eu felis malesuada, 
+                convallis eros quis, commodo quam. Mauris laoreet magna ipsum. Phasellus consequat dolor et 
+                lectus malesuada ullamcorper. Proin a pretium lacus, at ullamcorper lorem. Sed quis nibh ex. 
+                Vestibulum et rhoncus nulla. Integer dapibus faucibus tristique. Cras lacinia laoreet nibh in facilisis.
+                Curabitur non leo nec mauris posuere aliquam. Aenean ut vulputate libero. Sed nec volutpat nulla. Curabitur dapibus, dolor 
+                id ornare malesuada, lacus lorem rhoncus ligula, non varius urna nunc ac quam. Pellentesque accumsan lacus risus, 
+                ac vulputate neque luctus fringilla. Nunc finibus arcu purus, quis dapibus metus feugiat nec. Nullam lobortis interdum 
+                bibendum. Nam venenatis vel nisl quis blandit. Donec vitae vulputate neque, sit amet ornare quam. Aliquam efficitur 
+                tristique erat pretium iaculis. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac 
+                turpis egestas. Pellentesque blandit lacinia lobortis. Nullam posuere nisi at placerat rhoncus. Lorem ipsum 
+                dolor sit amet, consectetur adipiscing elit. Ut quis velit sed nisl rhoncus tristique.
+                Cras vulputate nunc non mollis imperdiet. Nulla accumsan ultrices massa et pretium. Aliquam eu eros justo.
+                Maecenas ut pretium nunc, nec malesuada arcu. Donec condimentum aliquet nulla at facilisis. 
+                Duis sed commodo quam, vel facilisis diam. Praesent sit amet tortor sem.
+                Vestibulum efficitur nec justo sit amet porttitor. Praesent cursus ac enim vel pharetra. Duis et 
+                eleifend turpis. Sed suscipit erat at ipsum ullamcorper, a porta libero aliquet. Nunc elementum dui 
+                nec metus maximus commodo. Duis libero nunc, volutpat ut tempor eu, iaculis eget est. Nunc tristique 
+                nibh non nulla pharetra, nec feugiat nisi rutrum. Nullam mollis dolor ut velit varius, a scelerisque 
+                orci consequat. Duis lacinia justo vel suscipit suscipit. Morbi id nulla ut nulla vehicula ornare.
+                Donec sapien nulla, finibus a elementum sed, posuere mollis massa.
+                Nam mollis auctor auctor. Maecenas purus est, eleifend et euismod nec, ultrices faucibus lectus. 
+                Nunc tincidunt consectetur dolor at euismod. Proin dignissim, sem dignissim pretium auctor, leo lacus 
+                mattis dui, a volutpat nunc ex ac turpis. Vestibulum egestas neque pharetra orci tristique commodo ut suscipit 
+                lacus. Quisque interdum ipsum ante, nec luctus erat suscipit sit amet. Vestibulum ante ipsum primis in 
+                faucibus orci luctus et ultrices posuere cubilia curae; Aenean hendrerit dui lectus. Donec ut dolor rhoncus, 
+                condimentum libero ut, bibendum lorem.
+            </p>
+        </section>
+
+        <section class="p-4 text-center"> <!-- Galeria de Jogos -->
+            <h1 class="mb-4 text-2xl font-bold">Galeria de Jogos</h1>
+            <div class="grid grid-cols-3 gap-4">
+                <% jogos.forEach(function(jogo) { %>
+                    <div class="game-card max-w-xs bg-white shadow-lg rounded-lg overflow-hidden relative" 
+                            data-images='<%= JSON.stringify(jogo.imagens) %>'>
+                        <a href="/jogos/<%= jogo.slug %>">
+                            <div class="relative group game-card">
+                                <img class="w-full h-48 object-cover" 
+                                        src="data:image/jpeg;base64,<%= jogo.imagens[0] %>" 
+                                        alt="<%= jogo.nome %>" 
+                                        id="game-image-<%= jogo.slug %>">
+                            </div>
+                            <div class="p-4">
+                                <h2 class="text-lg font-bold"><%= jogo.nome %></h2>
+                            </div>
+                        </a>
+                    </div>
+                <% }); %>   
+            </div>
+            
+            <div>
+                <a href="/todos-jogos?page=1&limit=9" class="my-8 py-2 px-4 text-white font-bold bg-blue-700 hover:bg-blue-800 rounded inline-block">
+                    Ver Todos
+                </a>
+            </div>            
+        </section>
     </main>
+    <%- include('partials/footer') %>
+    <script src="/utils.js"></script>
 </body>
 </html>
