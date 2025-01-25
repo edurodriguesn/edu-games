@@ -17,12 +17,18 @@ router.get('/admin/jogos/adicionar', usuarioAutenticado, (req, res) => {
                 categorias = [];
             }
     
-            db.all("SELECT nome FROM caracteristica WHERE tipo = 'desenvolvedor'", (err, desenvolvedores) => {
+            db.all("SELECT nome FROM caracteristica WHERE tipo = 'conhecimento'", (err, conhecimentos) => {
                 if (err) {
-                    desenvolvedores = [];
+                    conhecimentos = [];
                 }
-                // Renderiza a página com as listas (vazias ou preenchidas)
-                res.render('adicionar-jogo', { plataformas, categorias, desenvolvedores });
+
+                db.all("SELECT nome FROM caracteristica WHERE tipo = 'idioma'", (err, idiomas) => {
+                    if (err) {
+                        idiomas = [];
+                    }
+                    // renderiza a página com as listas (vazias ou preenchidas)
+                    res.render('admin/adicionar-jogo', { plataformas, categorias, conhecimentos, idiomas });
+                });
             });
         });
     });
@@ -32,12 +38,13 @@ router.get('/admin/jogos/adicionar', usuarioAutenticado, (req, res) => {
 //rota para adicionar jogo
 router.post('/admin/jogos/adicionar', upload.fields([{ name: 'imagemCapa', maxCount: 1 }, { name: 'imagens' }]), (req, res) => {
     try {
-        const { nome, ano, plataforma, categoria, desenvolvedor, descricao, linkTitle, linkURL } = req.body;
+        const { nome, ano, plataforma, categoria, conhecimento, idioma, descricao, linkTitle, linkURL } = req.body;
 
-        //verifica se as plataformas, categorias e desenvolvedores são arrays ou strings únicas
+        //verifica se as plataformas, categorias e conhecimentos são arrays ou strings únicas
         const plataformas = Array.isArray(plataforma) ? plataforma : [plataforma].filter(Boolean);
         const categorias = Array.isArray(categoria) ? categoria : [categoria].filter(Boolean);
-        const desenvolvedores = Array.isArray(desenvolvedor) ? desenvolvedor : [desenvolvedor].filter(Boolean);
+        const conhecimentos = Array.isArray(conhecimento) ? conhecimento : [conhecimento].filter(Boolean);
+        const idiomas = Array.isArray(idioma) ? idioma : [idioma].filter(Boolean);
 
         //links externos
         const linksExternos = Array.isArray(linkTitle) && Array.isArray(linkURL)
@@ -46,6 +53,7 @@ router.post('/admin/jogos/adicionar', upload.fields([{ name: 'imagemCapa', maxCo
                 ? [{ title: linkTitle, url: linkURL }]
                 : [];
 
+        //converte o nome do jogo em slug
         const slug = slugify(nome, { lower: true });
 
         //processar imagem de capa
@@ -71,14 +79,15 @@ router.post('/admin/jogos/adicionar', upload.fields([{ name: 'imagemCapa', maxCo
 
         //salvar as informações no banco de dados
         db.run(
-            `INSERT INTO jogo (nome, ano, plataforma, categoria, desenvolvedor, descricao, links, imagens, slug, data_criacao, data_modificacao) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            `INSERT INTO jogo (nome, ano, plataforma, categoria, conhecimento, idioma, descricao, links, imagens, slug, data_criacao, data_modificacao) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
                 nome,
                 ano,
                 JSON.stringify(plataformas),
                 JSON.stringify(categorias),
-                JSON.stringify(desenvolvedores),
+                JSON.stringify(conhecimentos),
+                JSON.stringify(idiomas),
                 descricao,
                 JSON.stringify(linksExternos),
                 JSON.stringify(imagensBase64),  //agora as imagens incluem a capa no índice 0

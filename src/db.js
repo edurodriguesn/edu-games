@@ -12,22 +12,27 @@ const db = new sqlite3.Database(dbPath, (err) => {
     console.log('Conectado com sucesso ao banco de dados.');
   }
 });
+
+//cria as tabelas no banco de dados
 db.serialize(() => {
+    //tabela de jogos
     db.run(`CREATE TABLE IF NOT EXISTS jogo (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         nome TEXT NOT NULL,
         ano INTEGER,
         plataforma TEXT,
         categoria TEXT,
-        desenvolvedor TEXT,
-        descricao TEXT,                                      -- Campo para descrição do jogo
-        links TEXT,                                          -- Links externos (armazenado como JSON)
-        imagens TEXT,                                        -- Imagens (armazenado como JSON)
-        slug TEXT UNIQUE,                                    -- Slug único para URL amigável
-        data_criacao DATETIME DEFAULT CURRENT_TIMESTAMP,     -- Data de criação
-        data_modificacao DATETIME DEFAULT CURRENT_TIMESTAMP  -- Data de modificação
+        conhecimento TEXT,
+        idioma TEXT,
+        descricao TEXT,                                      
+        links TEXT,                                          
+        imagens TEXT,                                        
+        slug TEXT UNIQUE,                                    
+        data_criacao DATETIME DEFAULT CURRENT_TIMESTAMP,     
+        data_modificacao DATETIME DEFAULT CURRENT_TIMESTAMP 
     )`);
     
+    //tabela de características
     db.run(`CREATE TABLE IF NOT EXISTS caracteristica (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         tipo TEXT,

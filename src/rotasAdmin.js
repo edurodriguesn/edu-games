@@ -7,14 +7,14 @@ const { usuarioAutenticado } = require('./rotasLogin'); //middleware de autentic
 router.get('/admin', usuarioAutenticado, (req, res) => {
     const sortField = req.query.sort === 'data_modificacao' ? 'data_modificacao' : 'data_criacao'; //ordenar por data de criação como padrão
 
-    const query = `SELECT id, nome, data_criacao, data_modificacao,slug FROM jogo ORDER BY ${sortField} DESC`;
+    const query = `SELECT id, nome, data_criacao, data_modificacao, slug FROM jogo ORDER BY ${sortField} DESC`;
 
     db.all(query, (err, jogos) => {
         if (err) {
             return res.status(500).send('Erro ao carregar os jogos');
         }
 
-        res.render('admin', { jogos, sort: sortField });
+        res.render('admin/admin', { jogos, sort: sortField });
     });
 });
 
@@ -43,7 +43,7 @@ router.post('/admin/jogos/:id/delete', usuarioAutenticado, (req, res) => {
         });
     });
 });
-//rota para adicionar uma nova opção (plataforma, categoria ou desenvolvedor): OK!
+//rota para adicionar uma nova opção (plataforma, categoria ou conhecimento)
 router.post('/add-option', (req, res) => {
     const { tipo, nome } = req.body;
 
@@ -55,8 +55,11 @@ router.post('/add-option', (req, res) => {
         case 'categoria':
             tableName = 'categoria';
             break;
-        case 'desenvolvedor':
-            tableName = 'desenvolvedor';
+        case 'conhecimento':
+            tableName = 'conhecimento';
+            break;
+        case 'idioma':
+            tableName = 'idioma';
             break;
         default:
             return res.status(400).json({ success: false, message: 'Tipo inválido' });

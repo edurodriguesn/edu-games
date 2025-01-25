@@ -6,7 +6,6 @@ const { usuarioAutenticado } = require('./rotasLogin');
 const upload = require('./upload');
 
 
-//middleware para processar o corpo da requisição
 router.get('/admin/jogos/editar/:slug', usuarioAutenticado, (req, res) => {
     const slug = req.params.slug;
 
@@ -15,18 +14,19 @@ router.get('/admin/jogos/editar/:slug', usuarioAutenticado, (req, res) => {
             return res.status(404).send('Jogo não encontrado');
         }
 
-        //certifique-se de que as propriedades sejam arrays
+        //converte as strings JSON em arrays
         jogo.plataforma = jogo.plataforma ? JSON.parse(jogo.plataforma) : [];
         jogo.categoria = jogo.categoria ? JSON.parse(jogo.categoria) : [];
-        jogo.desenvolvedor = jogo.desenvolvedor ? JSON.parse(jogo.desenvolvedor) : [];
+        jogo.conhecimento = jogo.conhecimento ? JSON.parse(jogo.conhecimento) : [];
+        jogo.idioma = jogo.idioma ? JSON.parse(jogo.idioma) : [];
         jogo.links = jogo.links ? JSON.parse(jogo.links) : [];
         jogo.imagens = jogo.imagens ? JSON.parse(jogo.imagens) : [];
 
-        //carregue a imagem de capa e as outras imagens
-        const imagemCapa = jogo.imagens[0] || null; //imagem de capa
-        const outrasImagens = jogo.imagens.slice(1); //outras imagens
+        //carrega a imagem de capa e as outras imagens
+        const imagemCapa = jogo.imagens[0] || null;
+        const outrasImagens = jogo.imagens.slice(1);
 
-        //carregue as listas de plataformas, categorias e desenvolvedores
+        //carrega as listas de caracteristicas
         db.all("SELECT nome FROM caracteristica where tipo = 'plataforma'", (err, plataformas) => {
             if (err) {
                 return res.status(500).send('Erro ao carregar as plataformas');
@@ -35,20 +35,26 @@ router.get('/admin/jogos/editar/:slug', usuarioAutenticado, (req, res) => {
                 if (err) {
                     return res.status(500).send('Erro ao carregar as categorias');
                 }
-                db.all("SELECT nome FROM caracteristica where tipo = 'desenvolvedor'", (err, desenvolvedores) => {
+                db.all("SELECT nome FROM caracteristica where tipo = 'conhecimento'", (err, conhecimentos) => {
                     if (err) {
-                        return res.status(500).send('Erro ao carregar os desenvolvedores');
+                        return res.status(500).send('Erro ao carregar as conhecimentos');
                     }
-                    //renderize a página com as novas variáveis
-                    res.render('editar-jogo', {
-                        jogo: {
-                            ...jogo,
-                            imagemCapa: imagemCapa,
-                            outrasImagens: outrasImagens //certifique-se de passar aqui
-                        },
-                        plataformas,
-                        categorias,
-                        desenvolvedores
+                    db.all("SELECT nome FROM caracteristica where tipo = 'idioma'", (err, idiomas) => {
+                        if (err) {
+                            return res.status(500).send('Erro ao carregar os idiomas');
+                        }
+                        //renderiza a página com as variáveis
+                        res.render('admin/editar-jogo', {
+                            jogo: {
+                                ...jogo,
+                                imagemCapa: imagemCapa,
+                                outrasImagens: outrasImagens
+                            },
+                            plataformas,
+                            categorias,
+                            conhecimentos,
+                            idiomas
+                        });
                     });
                 });
             });
@@ -58,10 +64,13 @@ router.get('/admin/jogos/editar/:slug', usuarioAutenticado, (req, res) => {
 
 router.post('/editar-jogo/:slug', upload.fields([{ name: 'imagemCapa', maxCount: 1 }, { name: 'imagens' }]), (req, res) => {
     const slug = req.params.slug;
+
+    //processa elementos removidos na edição, se houver
     const removedImages = req.body.removedImages ? JSON.parse(req.body.removedImages) : [];
     const removedPlataformas = req.body.removedPlataformas ? JSON.parse(req.body.removedPlataformas) : [];
     const removedCategorias = req.body.removedCategorias ? JSON.parse(req.body.removedCategorias) : [];
-    const removedDesenvolvedores = req.body.removedDesenvolvedores ? JSON.parse(req.body.removedDesenvolvedores) : [];
+    const removedConhecimentos = req.body.removedConhecimentos ? JSON.parse(req.body.removedConhecimentos) : [];
+    const removedIdiomas = req.body.removedIdiomas ? JSON.parse(req.body.removedIdiomas) : [];
     const removedLinks = req.body.removedLinks ? JSON.parse(req.body.removedLinks) : [];
 
     db.get("SELECT * FROM jogo WHERE slug = ?", [slug], (err, jogo) => {
@@ -70,7 +79,7 @@ router.post('/editar-jogo/:slug', upload.fields([{ name: 'imagemCapa', maxCount:
         }
 
         try {
-            const { nome, ano, plataforma, categoria, desenvolvedor, descricao, linkTitle, linkURL } = req.body;
+            const { nome, ano, plataforma, categoria, conhecimento, idioma, descricao, linkTitle, linkURL } = req.body;
 
             const novoNome = nome || jogo.nome;
             const novoAno = ano || jogo.ano;
@@ -88,12 +97,17 @@ router.post('/editar-jogo/:slug', upload.fields([{ name: 'imagemCapa', maxCount:
             const categoriasCombinadas = [...new Set([...categoriasAntigas, ...categoriasNovas])]
                                           .filter(cat => !removedCategorias.includes(cat));
 
-            //processamento de desenvolvedores
-            const desenvolvedoresAntigos = jogo.desenvolvedor ? JSON.parse(jogo.desenvolvedor) : [];
-            const desenvolvedoresNovos = desenvolvedor ? (Array.isArray(desenvolvedor) ? desenvolvedor : [desenvolvedor].filter(Boolean)) : [];
-            const desenvolvedoresCombinados = [...new Set([...desenvolvedoresAntigos, ...desenvolvedoresNovos])]
-                                               .filter(dev => !removedDesenvolvedores.includes(dev));
+            //processamento de conhecimentos
+            const conhecimentosAntigos = jogo.conhecimento ? JSON.parse(jogo.conhecimento) : [];
+            const conhecimentosNovos = conhecimento ? (Array.isArray(conhecimento) ? conhecimento : [conhecimento].filter(Boolean)) : [];
+            const conhecimentosCombinados = [...new Set([...conhecimentosAntigos, ...conhecimentosNovos])]
+                                               .filter(disc => !removedConhecimentos.includes(disc));
 
+            //processamento de idiomas
+            const idiomasAntigos = jogo.idioma ? JSON.parse(jogo.idioma) : [];
+            const idiomasNovos = idioma ? (Array.isArray(idioma) ? idioma : [idioma].filter(Boolean)) : [];
+            const idiomasCombinados = [...new Set([...idiomasAntigos, ...idiomasNovos])]
+                                               .filter(idi => !removedIdiomas.includes(idi));
             //processamento de links
             let linksExternos = Array.isArray(linkTitle) && Array.isArray(linkURL)
                 ? linkTitle.map((titulo, index) => ({ title: titulo, url: linkURL[index] }))
@@ -126,13 +140,14 @@ router.post('/editar-jogo/:slug', upload.fields([{ name: 'imagemCapa', maxCount:
 
             //atualizar o banco de dados
             db.run(
-                `UPDATE jogo SET nome = ?, ano = ?, plataforma = ?, categoria = ?, desenvolvedor = ?, descricao = ?, links = ?, imagens = ?, slug = ?, data_modificacao = ? WHERE slug = ?`,
+                `UPDATE jogo SET nome = ?, ano = ?, plataforma = ?, categoria = ?, conhecimento = ?, idioma = ?, descricao = ?, links = ?, imagens = ?, slug = ?, data_modificacao = ? WHERE slug = ?`,
                 [
                     novoNome,
                     novoAno,
                     JSON.stringify(plataformasCombinadas),
                     JSON.stringify(categoriasCombinadas),
-                    JSON.stringify(desenvolvedoresCombinados),
+                    JSON.stringify(conhecimentosCombinados),
+                    JSON.stringify(idiomasCombinados),
                     novaDescricao,
                     JSON.stringify(linksExternos),
                     JSON.stringify(todasImagens),
