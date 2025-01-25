@@ -4,7 +4,7 @@ require('dotenv').config(); //importa o módulo dotenv que contém as credenciai
 
 //rota para renderizar a página de login
 router.get('/login', (req, res) => {
-    res.render('login');
+    res.render('admin/login');
 });
 
 //rota para processar o login
