@@ -39,3 +39,6 @@ coverage/
 ehthumbs.db
 Icon?
 Desktop.ini
+
+# Tailwind build
+views/styles.css
