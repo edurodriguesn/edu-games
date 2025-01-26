@@ -1,44 +1,52 @@
-const sqlite3 = require('sqlite3').verbose();
+const { Pool } = require('pg');
 const path = require('path');
 
-//cria o caminho correto para o banco de dados
-const dbPath = path.join(__dirname, '..', 'db', 'database.db');
+require('dotenv').config();
 
-//abre uma conexão com o banco de dados SQLite
-const db = new sqlite3.Database(dbPath, (err) => {
-  if (err) {
-    console.error('Error ao abrir a conexão com o banco de dados:', err.message);
-  } else {
-    console.log('Conectado com sucesso ao banco de dados.');
-  }
+const pool = new Pool({
+  	user: process.env.POSTGRES_USER,
+  	host: process.env.POSTGRES_HOST,
+  	database: process.env.POSTGRES_DB,
+  	password: process.env.POSTGRES_PASSWORD,
+  	port: process.env.POSTGRES_PORT,
 });
 
-//cria as tabelas no banco de dados
-db.serialize(() => {
-    //tabela de jogos
-    db.run(`CREATE TABLE IF NOT EXISTS jogo (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        nome TEXT NOT NULL,
-        ano INTEGER,
-        plataforma TEXT,
-        categoria TEXT,
-        conhecimento TEXT,
-        idioma TEXT,
-        descricao TEXT,                                      
-        links TEXT,                                          
-        imagens TEXT,                                        
-        slug TEXT UNIQUE,                                    
-        data_criacao DATETIME DEFAULT CURRENT_TIMESTAMP,     
-        data_modificacao DATETIME DEFAULT CURRENT_TIMESTAMP 
-    )`);
+// Função para criar as tabelas
+(async () => {
+  	try {
+    	const client = await pool.connect();
+
+    await client.query(`
+      	CREATE TABLE IF NOT EXISTS jogo (
+        	id SERIAL PRIMARY KEY,
+        	nome TEXT NOT NULL,
+        	ano INTEGER,
+        	plataforma JSONB,        
+        	categoria JSONB,         
+        	conhecimento JSONB,      
+        	idioma JSONB,            
+        	descricao TEXT,
+        	links JSONB,             
+        	imagens JSONB,           
+        	slug TEXT UNIQUE,
+        	data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        	data_modificacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      	)
+    `);
     
-    //tabela de características
-    db.run(`CREATE TABLE IF NOT EXISTS caracteristica (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        tipo TEXT,
-        nome TEXT UNIQUE,
-        slug TEXT UNIQUE
-    )`);
-});
+    await client.query(`
+      	CREATE TABLE IF NOT EXISTS caracteristica (
+        	id SERIAL PRIMARY KEY,
+        	tipo TEXT,
+        	nome TEXT UNIQUE,
+        	slug TEXT UNIQUE
+      	)
+    `);
+    console.log('Conexão com o banco de dados estabelecida.');
+    client.release();
+  	} catch (err) {
+		console.error('Erro ao criar tabelas:', err.message);
+  	}
+})();
 
-module.exports = db;
+module.exports = pool;
