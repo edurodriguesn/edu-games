@@ -5,9 +5,9 @@
   "main": "app.js",
   "scripts": {
     "build:css": "npx tailwindcss -i ./src/styles.css -o ./views/styles.css",
-    "dev:css": "npx tailwindcss -i ./src/styles.css -o ./views/styles.css --watch",
+    "watch:css": "npx tailwindcss -i ./src/styles.css -o ./views/styles.css --watch",
     "start": "nodemon app.js", 
-    "dev": "npm run dev:css && npm run start"
+    "dev": "npm run watch:css && npm run start"
   },
   "keywords": [],
   "author": "",
