@@ -2,11 +2,12 @@
   "name": "gameshub",
   "version": "1.0.0",
   "description": "",
-  "main": "tailwind.config.js",
+  "main": "app.js",
   "scripts": {
     "build:css": "npx tailwindcss -i ./src/styles.css -o ./views/styles.css",
-    "watch:css": "npx tailwindcss -i ./src/styles.css -o ./views/styles.css --watch",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev:css": "npx tailwindcss -i ./src/styles.css -o ./views/styles.css --watch",
+    "start": "nodemon app.js", 
+    "dev": "npm run dev:css && npm run start"
   },
   "keywords": [],
   "author": "",
