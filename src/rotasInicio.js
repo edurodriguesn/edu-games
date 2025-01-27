@@ -7,16 +7,8 @@ router.get('/', async (req, res) => {
         const result = await pool.query(
             "SELECT nome, slug, imagens FROM jogo ORDER BY id DESC LIMIT 6"
         );
-
-        // mapeia os resultados para incluir apenas os campos desejados
-        const jogos = result.rows.map(row => ({
-            nome: row.nome,
-            slug: row.slug,
-            imagens: row.imagens // Agora `row.imagens` já é um objeto JSON (jsonb)
-        }));
-
         // renderiza a página com os dados dos jogos
-        res.render('index', { jogos });
+        res.render('index', { jogos: result.rows });
     } catch (err) {
         console.error('Erro ao buscar os jogos:', err.message);
         res.status(500).send('Erro no servidor.');
@@ -28,36 +20,27 @@ module.exports = router;
 
 
 router.get('/todos-jogos', async (req, res) => {
-    // Obtém os parâmetros de paginação com valores padrão
-    const page = parseInt(req.query.page) || 1; // Página atual (padrão: 1)
-    const limit = parseInt(req.query.limit) || 9; // Limite de itens por página (padrão: 9)
-    const offset = (page - 1) * limit; // Calcula o deslocamento
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 9;
+    const offset = (page - 1) * limit;
 
     try {
-        // Consulta SQL com LIMIT e OFFSET
         const jogosResult = await pool.query(
             "SELECT nome, slug, imagens FROM jogo LIMIT $1 OFFSET $2",
             [limit, offset]
         );
 
-        // Mapeia os resultados para incluir apenas os campos desejados
-        const jogos = jogosResult.rows.map(row => ({
-            nome: row.nome,
-            slug: row.slug,
-            imagens: row.imagens
-        }));
-
-        // Obtém o total de jogos para calcular o número de páginas
         const totalResult = await pool.query("SELECT COUNT(*) as total FROM jogo");
-        const total = parseInt(totalResult.rows[0].total, 10); // Converte para número inteiro
+        const total = parseInt(totalResult.rows[0].total, 10);
         const totalPages = Math.ceil(total / limit);
 
-        res.render('todos-jogos', { jogos, page, totalPages });
+        res.render('todos-jogos', { jogos: jogosResult.rows, page, totalPages });
     } catch (err) {
         console.error('Erro ao buscar os jogos:', err.message);
         res.status(500).send('Erro no servidor.');
     }
 });
+
 
 router.get('/sobre', (req, res) => {
     res.render('sobre');
@@ -81,7 +64,7 @@ router.get('/jogos/:slug', async (req, res) => {
 
         // buscar jogos relacionados com base no primeiro conhecimento, se houver
         const relatedResult = await pool.query(
-            `SELECT * FROM jogo 
+            `SELECT nome, slug, imagens FROM jogo 
              WHERE EXISTS (
                 SELECT 1 FROM jsonb_array_elements_text(conhecimento) AS elem 
                 WHERE elem ILIKE $1
@@ -89,12 +72,6 @@ router.get('/jogos/:slug', async (req, res) => {
              LIMIT 3`,
             [`%${conhecimento}%`, slug]
         );
-
-        const jogosRelacionados = relatedResult.rows.map(row => ({
-            nome: row.nome,
-            slug: row.slug,
-            imagens: row.imagens
-        }));
 
         // renderiza a página com os dados do jogo e jogos relacionados
         res.render('template', {
@@ -110,16 +87,13 @@ router.get('/jogos/:slug', async (req, res) => {
                 imagens: jogo.imagens || [],
                 slug: jogo.slug
             },
-            jogosRelacionados
+            jogosRelacionados: relatedResult.rows
         });
     } catch (err) {
         console.error('Erro ao buscar os dados do jogo:', err.message);
         res.status(500).send('Erro ao buscar o jogo');
     }
 });
-
-
-
 
 router.get('/filtrar/:caracteristica', async(req, res) => {
     //pega o tipo da caracteristica presente na url
@@ -146,6 +120,10 @@ router.get('/filtrar/:caracteristica', async(req, res) => {
 router.get('/filtrar/:caracteristica/:slug', async (req, res) => {
     const tipoCaracteristica = req.params.caracteristica;
     
+    const page = parseInt(req.query.page) || 1; // Página atual (padrão: 1)
+    const limit = parseInt(req.query.limit) || 9; // Limite de itens por página (padrão: 9)
+    const offset = (page - 1) * limit; // Calcula o deslocamento
+    
     try {
         // consulta para buscar o nome da característica
         const result = await pool.query("SELECT nome FROM caracteristica WHERE slug = $1", [req.params.slug]);
@@ -158,21 +136,21 @@ router.get('/filtrar/:caracteristica/:slug', async (req, res) => {
         
         // prepara a consulta com base no tipo de característica e filtra os jogos
         const query = `
-            SELECT * FROM jogo
-            WHERE ${tipoCaracteristica} @> $1::jsonb`; // verifica se o valor está contido no campo jsonb
-        
-        const queryResult = await pool.query(query, [JSON.stringify([nomeCaracteristica])]); // Passa o valor como array
+            SELECT nome, slug, imagens FROM jogo
+            WHERE ${tipoCaracteristica} @> $1::jsonb
+            LIMIT $2 OFFSET $3`; // verifica se o valor está contido no campo jsonb
+        const queryResult = await pool.query(query, [JSON.stringify([nomeCaracteristica]), limit, offset]); // Passa o valor como array
 
-        const jogos = queryResult.rows.map(row => ({
-            nome: row.nome,
-            slug: row.slug,
-            imagens: row.imagens 
-        }));
+        const totalResult = await pool.query("SELECT COUNT(*) as total FROM jogo");
+        const total = parseInt(totalResult.rows[0].total, 10);
+        const totalPages = Math.ceil(total / limit);
 
         res.render('jogos-filtrados', {
-            jogos,
+            jogos: queryResult.rows,
             tipoCaracteristica,
-            nomeCaracteristica
+            nomeCaracteristica,
+            page,
+            totalPages
         });
     } catch (err) {
         console.error("Erro ao buscar jogos filtrados:", err);
@@ -183,11 +161,17 @@ router.get('/filtrar/:caracteristica/:slug', async (req, res) => {
 router.get('/pesquisa', async (req, res) => {
     const termoPesquisa = req.query.pesquisa;
 
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 9;
+    const offset = (page - 1) * limit;
+
     if (!termoPesquisa || termoPesquisa.trim() === '') {
         return res.render('resultados-pesquisa', {
             jogos: [],
             termoPesquisa: '',
-            mensagem: 'Por favor, insira um termo de pesquisa.'
+            mensagem: 'Por favor, insira um termo de pesquisa.',
+            page: 1,
+            totalPages: 1
         });
     }
 
@@ -196,37 +180,39 @@ router.get('/pesquisa', async (req, res) => {
 
     // Consulta para buscar jogos com base no termo de pesquisa
     const query = `
-        SELECT * FROM jogo 
+        SELECT nome, slug, imagens FROM jogo 
         WHERE 
             LOWER(nome) LIKE LOWER($1) OR 
             LOWER(descricao) LIKE LOWER($1) OR 
             categoria @> to_jsonb($1) OR 
             conhecimento @> to_jsonb($1)
-    `;
+        LIMIT $2 OFFSET $3
+        `;
 
     try {
-        const result = await pool.query(query, [termoFormatado]);
+        const result = await pool.query(query, [termoFormatado, limit, offset]);
 
-        const jogos = result.rows.map(row => ({
-            nome: row.nome,
-            slug: row.slug,
-            descricao: row.descricao,
-            imagens: row.imagens
-        }));
-
-        if (jogos.length === 0) {
+        if (result.rows.length === 0) {
             return res.render('resultados-pesquisa', {
                 jogos: [],
                 termoPesquisa,
-                mensagem: 'Nenhum resultado encontrado para sua pesquisa.'
+                mensagem: 'Nenhum resultado encontrado para sua pesquisa.',
+                page,
+                totalPages: 1
             });
         }
 
+        const totalResult = await pool.query("SELECT COUNT(*) as total FROM jogo");
+        const total = parseInt(totalResult.rows[0].total, 10);
+        const totalPages = Math.ceil(total / limit);
+
         // renderiza os resultados
         res.render('resultados-pesquisa', {
-            jogos,
+            jogos: result.rows,
             termoPesquisa,
-            mensagem: null
+            mensagem: null,
+            page,
+            totalPages
         });
     } catch (err) {
         console.error("Erro ao buscar jogos:", err);

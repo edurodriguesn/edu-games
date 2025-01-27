@@ -23,7 +23,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6"> 
                 <% caracteristicas.forEach(function(caracteristica) { %>
                     <div class="game-card max-w-xs bg-white shadow-lg rounded-lg overflow-hidden relative">
-                        <a href="/filtrar/<%= caracteristica.tipo %>/<%= caracteristica.slug %>">
+                        <a href="/filtrar/<%= caracteristica.tipo %>/<%= caracteristica.slug %>?page=1&limit=9">
                             <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-lg w-full transition duration-300 ease-in-out transform hover:scale-105">
                                 <%= caracteristica.nome %>
                             </button>

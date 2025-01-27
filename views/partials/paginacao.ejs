@@ -1,0 +1,14 @@
+<div class="mt-6 flex justify-center space-x-4">
+    <% if (page > 1) { %>
+        <a href="/jogos?page=<%= page - 1 %>&limit=9" 
+            class="py-2 px-4 bg-blue-700 text-white rounded hover:bg-blue-800">
+            Página Anterior
+        </a>
+    <% } %>
+    <% if (page < totalPages) { %>
+        <a href="/jogos?page=<%= page + 1 %>&limit=9" 
+            class="py-2 px-4 bg-blue-700 text-white rounded hover:bg-blue-800">
+            Próxima Página
+        </a>
+    <% } %>
+</div>

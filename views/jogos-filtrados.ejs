@@ -22,7 +22,7 @@
                 </a>
             <% } %>
             <%- include('partials/game-card', { jogos: jogos }) %>
-        
+            <%- include('partials/paginacao', { page: page, totalPages: totalPages }) %>
         </section>
     </main>
 
