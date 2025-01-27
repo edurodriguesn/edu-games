@@ -41,6 +41,7 @@ services:
       - "5432:5432"         # Expondo a porta 5432 do PostgreSQL
     volumes:
       - postgres_data:/var/lib/postgresql/data  # Persistência de dados
+      - ./db_script.sql:/docker-entrypoint-initdb.d/db_script.sql # Executa o script SQL
     networks:
       - backend
 
