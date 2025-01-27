@@ -20,7 +20,7 @@ router.get('/admin/jogos/adicionar', usuarioAutenticado, async (req, res) => {
         const idiomasResult = await pool.query("SELECT nome FROM caracteristica WHERE tipo = $1", ['idioma']);
         const idiomas = idiomasResult.rows || [];
 
-        res.render('admin/adicionar-jogo', { plataformas, categorias, conhecimentos, idiomas });
+        res.render('admin/edit-add', {jogo: {}, plataformas, categorias, conhecimentos, idiomas, isEdit: false});
     } catch (err) {
         res.status(500).send('Erro ao carregar as opções para adicionar o jogo');
     }

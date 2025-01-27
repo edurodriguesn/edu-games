@@ -39,7 +39,7 @@ router.get('/admin/jogos/editar/:slug', usuarioAutenticado, async (req, res) => 
         ]);
 
         // Renderiza a página com as variáveis
-        res.render('admin/editar-jogo', {
+        res.render('admin/edit-add', {
             jogo: {
                 ...jogo,
                 imagemCapa: imagemCapa,
@@ -48,7 +48,8 @@ router.get('/admin/jogos/editar/:slug', usuarioAutenticado, async (req, res) => 
             plataformas: plataformas.rows,
             categorias: categorias.rows,
             conhecimentos: conhecimentos.rows,
-            idiomas: idiomas.rows
+            idiomas: idiomas.rows,
+            isEdit: true
         });
 
     } catch (err) {
