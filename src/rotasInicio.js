@@ -46,6 +46,10 @@ router.get('/sobre', (req, res) => {
     res.render('sobre');
 });
 
+router.get('/contato', (req, res) => {
+    res.render('contato');
+});
+
 //carregar um jogo
 router.get('/jogos/:slug', async (req, res) => {
     const slug = req.params.slug;

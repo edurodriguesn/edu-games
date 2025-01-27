@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contato - Games Hub</title>
+    <link href="/views/styles.css" rel="stylesheet">
+    <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
+</head>
+<body class="flex flex-col min-h-screen bg-gray-100">
+
+    <%- include('partials/cabecalho') %>
+
+    <main class="flex-grow w-3/4 mx-auto my-8 py-6 px-32 rounded-lg bg-white shadow-lg">
+        <section>
+            <%- include('partials/central') %>
+            <h2 class="text-xl font-bold mb-4 text-center">Entre em Contato</h2>
+            <p class="mb-4 text-gray-700 text-center">
+                Caso tenha dúvidas, sugestões ou precise falar conosco, aqui estão os nossos canais de contato:
+            </p>
+        </section>
+
+        <section class="mt-8">
+            <div class="space-y-4">
+                <div class="text-center">
+                    <h3 class="text-lg font-bold text-gray-800">Email</h3>
+                    <p class="text-gray-700">gameshub@unifap.br</p>
+                </div>
+
+                <div class="text-center">
+                    <h3 class="text-lg font-bold text-gray-800">Telefone</h3>
+                    <p class="text-gray-700">+55 (96) 99156-6875</p>
+                </div>
+
+                <div class="text-center">
+                    <h3 class="text-lg font-bold text-gray-800">Redes Sociais</h3>
+                    <p class="text-gray-700">
+                        <a href="https://facebook.com/gameshub" target="_blank" class="text-blue-500 hover:underline">Facebook</a> | 
+                        <a href="https://twitter.com/gameshub" target="_blank" class="text-blue-500 hover:underline">Twitter</a> | 
+                        <a href="https://instagram.com/gameshub" target="_blank" class="text-pink-500 hover:underline">Instagram</a>
+                    </p>
+                </div>
+
+                <div class="text-center">
+                    <h3 class="text-lg font-bold text-gray-800">Endereço</h3>
+                    <p class="text-gray-700">
+                        Universidade Federal do Amapá<br>
+                        Bloco de Engenharia Elétrica e Ciência da Computação<br>
+                        Rodovia Josmar Chaves Pinto - KM 02<br>
+                        Macapá, AP, Brasil<br>
+                        CEP 68903-419
+                    </p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <%- include('partials/footer') %>
+
+</body>
+</html>
