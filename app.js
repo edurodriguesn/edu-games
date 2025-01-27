@@ -13,8 +13,6 @@ const app = express();//inicializa o express
 
 appConfig(app);
 
-const db = require('./src/db'); //importada a confuguração do banco de dados
-
 app.use(express.static(path.join(__dirname, '/'))); //middleware para servir arquivos estáticos
 
 //disponibilizacao das rotas
