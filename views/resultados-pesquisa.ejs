@@ -16,7 +16,7 @@
         <%- include('partials/central') %>
         <section class="p-4 text-center">
             <h1 class="mb-6 text-3xl font-semibold text-gray-800">
-                Resultados para "<%= termoPesquisa %>" (<%= jogos.length %>)
+                Resultados para "<%= termoPesquisa %>" (<%= total %>)
             </h1>
             
             <% if (mensagem) { %>
@@ -27,7 +27,12 @@
             <% } else { %>
                 <%- include('partials/game-card', { jogos: jogos }) %>
             <% } %>
-            <%- include('partials/paginacao', { page: page, totalPages: totalPages }) %>
+            
+            <%- include('partials/paginacao', { 
+                rota: "pesquisa?pesquisa=" + encodeURIComponent(termoPesquisa) + "&", 
+                page: page, 
+                totalPages: totalPages  
+                }) %>
         </section>
     </main>
 
