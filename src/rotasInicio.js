@@ -10,14 +10,9 @@ router.get('/', async (req, res) => {
         // renderiza a página com os dados dos jogos
         res.render('index', { jogos: result.rows });
     } catch (err) {
-        console.error('Erro ao buscar os jogos:', err.message);
-        res.status(500).send('Erro no servidor.');
+        res.status(500).send('Erro no servidor');
     }
 });
-
-
-module.exports = router;
-
 
 router.get('/todos-jogos', async (req, res) => {
     const page = parseInt(req.query.page) || 1;
@@ -34,10 +29,9 @@ router.get('/todos-jogos', async (req, res) => {
         const total = parseInt(totalResult.rows[0].total, 10);
         const totalPages = Math.ceil(total / limit);
 
-        res.render('todos-jogos', { jogos: jogosResult.rows, page, totalPages });
+        res.render('todos-jogos', { jogos: jogosResult.rows, total, page, totalPages });
     } catch (err) {
-        console.error('Erro ao buscar os jogos:', err.message);
-        res.status(500).send('Erro no servidor.');
+        return res.status(500).render('erro', { mensagem: 'Erro ao carregar todos os jogos', statusCode: 500 });
     }
 });
 
@@ -60,7 +54,7 @@ router.get('/jogos/:slug', async (req, res) => {
         const jogo = jogoResult.rows[0];
 
         if (!jogo) {
-            return res.status(404).send('Jogo não encontrado');
+            return res.status(404).render('erro', { mensagem: 'Jogo não encontrado', statusCode: 404 });
         }
 
         // garante a manipulação correta dos campos JSON
@@ -94,8 +88,7 @@ router.get('/jogos/:slug', async (req, res) => {
             jogosRelacionados: relatedResult.rows
         });
     } catch (err) {
-        console.error('Erro ao buscar os dados do jogo:', err.message);
-        res.status(500).send('Erro ao buscar o jogo');
+        return res.status(500).render('erro', { mensagem: 'Jogo não encontrado' });
     }
 });
 
@@ -112,12 +105,12 @@ router.get('/filtrar/:caracteristica', async(req, res) => {
         );
         const caracteristicas = result.rows;
         if (caracteristicas.length === 0) {
-            return res.status(404).send('Nenhuma característica encontrada');
+            return res.status(404).render('erro', { mensagem: 'Tipo de caracerística não encontrado', statusCode: 404 });
         } //apenas para evitar erros caso o banco de dados esteja vazio
 
         res.render('filtrar', { caracteristicas, tipoCaracteristica: tipoCapitalizado});
     } catch (err) {
-        return res.status(500).send('Erro ao buscar as características');
+        return res.status(500).render('erro', { mensagem: 'Erro ao carregar caracerísticas', statusCode: 500 });
     }
 });
 
@@ -133,7 +126,7 @@ router.get('/filtrar/:caracteristica/:slug', async (req, res) => {
         const result = await pool.query("SELECT nome FROM caracteristica WHERE slug = $1", [req.params.slug]);
         
         if (result.rows.length === 0) {
-            return res.status(404).send("Nenhuma característica encontrada");
+            return res.status(404).render('erro', { mensagem: 'Caracerística não encontrada em nossa base de dados', statusCode: 404 });
         }
 
         const nomeCaracteristica = result.rows[0].nome;
@@ -153,12 +146,13 @@ router.get('/filtrar/:caracteristica/:slug', async (req, res) => {
             jogos: queryResult.rows,
             tipoCaracteristica,
             nomeCaracteristica,
+            slugCaracteristica: req.params.slug,
+            total,
             page,
             totalPages
         });
     } catch (err) {
-        console.error("Erro ao buscar jogos filtrados:", err);
-        return res.status(500).send('Erro ao buscar os jogos filtrados');
+        return res.status(404).render('erro', { mensagem: 'Erro ao carregar caracerística', statusCode: 404 });
     }
 });
 
@@ -215,12 +209,12 @@ router.get('/pesquisa', async (req, res) => {
             jogos: result.rows,
             termoPesquisa,
             mensagem: null,
+            total,
             page,
             totalPages
         });
     } catch (err) {
-        console.error("Erro ao buscar jogos:", err);
-        return res.status(500).send('Erro ao processar a pesquisa');
+        return res.status(500).render('erro', { mensagem: 'Erro ao processar a pesquisa', statusCode: 500 });
     }
 });
 
