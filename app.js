@@ -22,6 +22,10 @@ app.use(rotasAdmin);
 app.use(rotasAdicionarJogo);
 app.use(rotasEditarJogo);
 
+// Middleware para capturar rotas não definidas (404)
+app.use((req, res) => {
+    res.status(404).render('erro', { mensagem: 'Página não encontrada' , statusCode: 404});
+});
 
 //inicialização do servidor
 const PORT = process.env.PORT || 3000;
