@@ -1,189 +1,175 @@
 const express = require('express');
 const router = express.Router();
-const db = require('./db');
+const pool = require('./db');
 
-//renderizar pagina inicial: OK!
-router.get('/', (req, res) => {
-    db.all("SELECT nome, slug, imagens FROM jogo ORDER BY id DESC LIMIT 6", [], (err, rows) => {
-        if (err) {
-            throw err;
-        }
-        
-        //mapeia os resultados para incluir apenas os campos desejados
-        const jogos = rows.map(row => ({
-            nome: row.nome,
-            slug: row.slug,
-            imagens: JSON.parse(row.imagens)
-        }));
-
-        res.render('index', { jogos });
-    });
+router.get('/', async (req, res) => {
+    try {
+        const result = await pool.query(
+            "SELECT nome, slug, imagens FROM jogo ORDER BY id DESC LIMIT 6"
+        );
+        // renderiza a página com os dados dos jogos
+        res.render('index', { jogos: result.rows });
+    } catch (err) {
+        res.status(500).send('Erro no servidor');
+    }
 });
 
-router.get('/todos-jogos', (req, res) => {
-    // Obtém os parâmetros de paginação com valores padrão
-    const page = parseInt(req.query.page) || 1; // Página atual (padrão: 1)
-    const limit = parseInt(req.query.limit) || 9; // Limite de itens por página (padrão: 9)
-    const offset = (page - 1) * limit; // Calcula o deslocamento
+router.get('/todos-jogos', async (req, res) => {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 9;
+    const offset = (page - 1) * limit;
 
-    // Consulta SQL com LIMIT e OFFSET
-    db.all("SELECT nome, slug, imagens FROM jogo LIMIT ? OFFSET ?", [limit, offset], (err, rows) => {
-        if (err) {
-            throw err;
-        }
+    try {
+        const jogosResult = await pool.query(
+            "SELECT nome, slug, imagens FROM jogo LIMIT $1 OFFSET $2",
+            [limit, offset]
+        );
 
-        // Mapeia os resultados para incluir apenas os campos desejados
-        const jogos = rows.map(row => ({
-            nome: row.nome,
-            slug: row.slug,
-            imagens: JSON.parse(row.imagens)
-        }));
+        const totalResult = await pool.query("SELECT COUNT(*) as total FROM jogo");
+        const total = parseInt(totalResult.rows[0].total, 10);
+        const totalPages = Math.ceil(total / limit);
 
-        // Obtém o total de jogos para calcular o número de páginas
-        db.get("SELECT COUNT(*) as total FROM jogo", (err, result) => {
-            if (err) {
-                throw err;
-            }
-
-            const total = result.total;
-            const totalPages = Math.ceil(total / limit);
-
-            res.render('todos-jogos', { jogos, page, totalPages });
-        });
-    });
+        res.render('todos-jogos', { jogos: jogosResult.rows, total, page, totalPages });
+    } catch (err) {
+        return res.status(500).render('erro', { mensagem: 'Erro ao carregar todos os jogos', statusCode: 500 });
+    }
 });
-
 
 
 router.get('/sobre', (req, res) => {
     res.render('sobre');
 });
 
-//carregar um jogo
-router.get('/jogos/:slug', (req, res) => {
-    const slug = req.params.slug;
-    
-    // Buscar o jogo no banco de dados
-    db.get('SELECT * FROM jogo WHERE slug = ?', [slug], (err, jogo) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).send('Erro ao buscar o jogo');
-        }
-    
-        if (!jogo) {
-            return res.status(404).send('Jogo não encontrado');
-        }
-
-        // Parse da conhecimento e pega o primeiro elemento
-        const conhecimento = JSON.parse(jogo.conhecimento)[0]; // Pega o primeiro elemento
-
-        // Buscar jogos relacionados com base na primeira conhecimento
-        db.all(
-            'SELECT * FROM jogo WHERE conhecimento LIKE ? AND slug != ? LIMIT 3',
-            [`%${conhecimento}%`, slug],
-            (err, rows) => {
-                let jogosRelacionados = [];
-                if (!err && rows) {
-                    jogosRelacionados = rows.map(row => ({
-                        nome: row.nome,
-                        slug: row.slug,
-                        imagens: JSON.parse(row.imagens)
-                    }));
-                }
-    
-                // Renderizar o template EJS com os dados do jogo e os jogos relacionados
-                res.render('template', {
-                    jogo: {
-                        nome: jogo.nome,
-                        ano: jogo.ano,
-                        plataformas: JSON.parse(jogo.plataforma),
-                        categorias: JSON.parse(jogo.categoria),
-                        conhecimentos: JSON.parse(jogo.conhecimento),
-                        idiomas: JSON.parse(jogo.idioma),
-                        descricao: jogo.descricao,
-                        links: JSON.parse(jogo.links),
-                        imagens: JSON.parse(jogo.imagens),
-                        slug: jogo.slug
-                    },
-                    jogosRelacionados
-                });
-            }
-        );
-    });    
+router.get('/contato', (req, res) => {
+    res.render('contato');
 });
 
+//carregar um jogo
+router.get('/jogos/:slug', async (req, res) => {
+    const slug = req.params.slug;
 
-router.get('/filtrar/:caracteristica', (req, res) => {
+    try {
+        // Buscar o jogo pelo slug
+        const jogoResult = await pool.query('SELECT * FROM jogo WHERE slug = $1', [slug]);
+        const jogo = jogoResult.rows[0];
+
+        if (!jogo) {
+            return res.status(404).render('erro', { mensagem: 'Jogo não encontrado', statusCode: 404 });
+        }
+
+        // garante a manipulação correta dos campos JSON
+        const conhecimento = jogo.conhecimento ? jogo.conhecimento[0] : null;
+
+        // buscar jogos relacionados com base no primeiro conhecimento, se houver
+        const relatedResult = await pool.query(
+            `SELECT nome, slug, imagens FROM jogo 
+             WHERE EXISTS (
+                SELECT 1 FROM jsonb_array_elements_text(conhecimento) AS elem 
+                WHERE elem ILIKE $1
+              ) AND slug != $2 
+             LIMIT 3`,
+            [`%${conhecimento}%`, slug]
+        );
+
+        // renderiza a página com os dados do jogo e jogos relacionados
+        res.render('template', {
+            jogo: {
+                nome: jogo.nome,
+                ano: jogo.ano,
+                plataformas: jogo.plataforma || [],
+                categorias: jogo.categoria || [],
+                conhecimentos: jogo.conhecimento || [],
+                idiomas: jogo.idioma || [],
+                descricao: jogo.descricao,
+                links: jogo.links || [],
+                imagens: jogo.imagens || [],
+                slug: jogo.slug
+            },
+            jogosRelacionados: relatedResult.rows
+        });
+    } catch (err) {
+        return res.status(500).render('erro', { mensagem: 'Jogo não encontrado' });
+    }
+});
+
+router.get('/filtrar/:caracteristica', async(req, res) => {
     //pega o tipo da caracteristica presente na url
     const tipoCaracteristica = req.params.caracteristica;
     
     //transforma a primeira letra da string em maiuscula
     const tipoCapitalizado = tipoCaracteristica.charAt(0).toUpperCase() + tipoCaracteristica.slice(1);
-    
-    db.all("SELECT * FROM caracteristica WHERE tipo = ?", [tipoCaracteristica], (err, rows) => {
-        if (err) {
-            console.error('Erro ao buscar características:', err);
-            return res.status(500).send('Erro ao buscar as características');
-        }
-
-        if (rows.length === 0) {
-            console.warn('Nenhuma característica encontrada para:', tipoCaracteristica);
-            return res.status(404).send('Nenhuma característica encontrada');
+    try {
+        result = await pool.query(
+            "SELECT * FROM caracteristica WHERE tipo = $1",
+            [tipoCaracteristica]
+        );
+        const caracteristicas = result.rows;
+        if (caracteristicas.length === 0) {
+            return res.status(404).render('erro', { mensagem: 'Tipo de caracerística não encontrado', statusCode: 404 });
         } //apenas para evitar erros caso o banco de dados esteja vazio
 
-        res.render('filtrar', { caracteristicas: rows, tipoCaracteristica: tipoCapitalizado});
-    });
+        res.render('filtrar', { caracteristicas, tipoCaracteristica: tipoCapitalizado});
+    } catch (err) {
+        return res.status(500).render('erro', { mensagem: 'Erro ao carregar caracerísticas', statusCode: 500 });
+    }
 });
 
-router.get('/filtrar/:caracteristica/:slug', (req, res) => {
+router.get('/filtrar/:caracteristica/:slug', async (req, res) => {
     const tipoCaracteristica = req.params.caracteristica;
     
-    db.get("SELECT nome FROM caracteristica WHERE slug = ?", [req.params.slug], (err, row) => {
-        if (err) {
-            console.error("Erro ao buscar característica:", err);
-            return res.status(500).send("Erro ao buscar característica");
-        }
+    const page = parseInt(req.query.page) || 1; // Página atual (padrão: 1)
+    const limit = parseInt(req.query.limit) || 9; // Limite de itens por página (padrão: 9)
+    const offset = (page - 1) * limit; // Calcula o deslocamento
+    
+    try {
+        // consulta para buscar o nome da característica
+        const result = await pool.query("SELECT nome FROM caracteristica WHERE slug = $1", [req.params.slug]);
         
-        if (!row) {
-            return res.status(404).send("Nenhuma característica encontrada");
+        if (result.rows.length === 0) {
+            return res.status(404).render('erro', { mensagem: 'Caracerística não encontrada em nossa base de dados', statusCode: 404 });
         }
+
+        const nomeCaracteristica = result.rows[0].nome;
         
-        // Prepara a query
-        const nomeCaracteristica = row.nome;
-        const query = `SELECT * FROM jogo WHERE ${tipoCaracteristica} LIKE ?`;
-        const valor = `%${nomeCaracteristica}%`; // % adicionado para busca em JSON
+        // prepara a consulta com base no tipo de característica e filtra os jogos
+        const query = `
+            SELECT nome, slug, imagens FROM jogo
+            WHERE ${tipoCaracteristica} @> $1::jsonb
+            LIMIT $2 OFFSET $3`; // verifica se o valor está contido no campo jsonb
+        const queryResult = await pool.query(query, [JSON.stringify([nomeCaracteristica]), limit, offset]); // Passa o valor como array
 
-        db.all(query, [valor], (err, rows) => {
-            if (err) {
-                console.error("Erro ao buscar os jogos:", err);
-                return res.status(500).send('Erro ao buscar os jogos');
-            }
+        const totalResult = await pool.query("SELECT COUNT(*) as total FROM jogo");
+        const total = parseInt(totalResult.rows[0].total, 10);
+        const totalPages = Math.ceil(total / limit);
 
-            // Separa os campos desejados ou retorna uma lista vazia se nenhum jogo foi encontrado
-            const jogos = rows.map(row => ({
-                nome: row.nome,
-                slug: row.slug,
-                imagens: JSON.parse(row.imagens)
-            }));
-
-            // Renderiza a página com os jogos filtrados (vazia ou com resultados)
-            res.render('jogos-filtrados', {
-                jogos,
-                tipoCaracteristica,
-                nomeCaracteristica
-            });
+        res.render('jogos-filtrados', {
+            jogos: queryResult.rows,
+            tipoCaracteristica,
+            nomeCaracteristica,
+            slugCaracteristica: req.params.slug,
+            total,
+            page,
+            totalPages
         });
-    });
+    } catch (err) {
+        return res.status(404).render('erro', { mensagem: 'Erro ao carregar caracerística', statusCode: 404 });
+    }
 });
 
-router.get('/pesquisa', (req, res) => {
+router.get('/pesquisa', async (req, res) => {
     const termoPesquisa = req.query.pesquisa;
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 9;
+    const offset = (page - 1) * limit;
 
     if (!termoPesquisa || termoPesquisa.trim() === '') {
         return res.render('resultados-pesquisa', {
             jogos: [],
             termoPesquisa: '',
-            mensagem: 'Por favor, insira um termo de pesquisa.'
+            mensagem: 'Por favor, insira um termo de pesquisa.',
+            page: 1,
+            totalPages: 1
         });
     }
 
@@ -192,43 +178,44 @@ router.get('/pesquisa', (req, res) => {
 
     // Consulta para buscar jogos com base no termo de pesquisa
     const query = `
-        SELECT * FROM jogo 
+        SELECT nome, slug, imagens FROM jogo 
         WHERE 
-            LOWER(nome) LIKE LOWER(?) OR 
-            LOWER(descricao) LIKE LOWER(?) OR 
-            LOWER(categoria) LIKE LOWER(?) OR 
-            LOWER(conhecimento) LIKE LOWER(?)
-    `;
+            LOWER(nome) LIKE LOWER($1) OR 
+            LOWER(descricao) LIKE LOWER($1) OR 
+            categoria @> to_jsonb($1) OR 
+            conhecimento @> to_jsonb($1)
+        LIMIT $2 OFFSET $3
+        `;
 
-    db.all(query, [termoFormatado, termoFormatado, termoFormatado, termoFormatado], (err, rows) => {
-        if (err) {
-            console.error("Erro ao buscar jogos:", err);
-            return res.status(500).send('Erro ao processar a pesquisa');
-        }
+    try {
+        const result = await pool.query(query, [termoFormatado, limit, offset]);
 
-        const jogos = rows.map(row => ({
-            nome: row.nome,
-            slug: row.slug,
-            descricao: row.descricao,
-            imagens: JSON.parse(row.imagens)
-        }));
-
-        if (jogos.length === 0) {
+        if (result.rows.length === 0) {
             return res.render('resultados-pesquisa', {
                 jogos: [],
                 termoPesquisa,
-                mensagem: 'Nenhum resultado encontrado para sua pesquisa.'
+                mensagem: 'Nenhum resultado encontrado para sua pesquisa.',
+                page,
+                totalPages: 1
             });
         }
 
-        // Renderiza os resultados
-        res.render('resultados-pesquisa', {
-            jogos,
-            termoPesquisa,
-            mensagem: null
-        });
-    });
-});
+        const totalResult = await pool.query("SELECT COUNT(*) as total FROM jogo");
+        const total = parseInt(totalResult.rows[0].total, 10);
+        const totalPages = Math.ceil(total / limit);
 
+        // renderiza os resultados
+        res.render('resultados-pesquisa', {
+            jogos: result.rows,
+            termoPesquisa,
+            mensagem: null,
+            total,
+            page,
+            totalPages
+        });
+    } catch (err) {
+        return res.status(500).render('erro', { mensagem: 'Erro ao processar a pesquisa', statusCode: 500 });
+    }
+});
 
 module.exports = router;

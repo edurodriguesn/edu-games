@@ -1,112 +1,111 @@
 const express = require('express');
 const router = express.Router();
-const db = require('./db'); 
+const pool = require('./db'); 
 const slugify = require('slugify');
 const { usuarioAutenticado } = require('./rotasLogin');
 const upload = require('./upload');
 
 // rota para renderizar a página de criação de novo jogo:
-router.get('/admin/jogos/adicionar', usuarioAutenticado, (req, res) => {
-    db.all("SELECT nome FROM caracteristica WHERE tipo = 'plataforma'", (err, plataformas) => {
-        if (err) {
-            plataformas = [];
-        }
-    
-        db.all("SELECT nome FROM caracteristica WHERE tipo = 'categoria'", (err, categorias) => {
-            if (err) {
-                categorias = [];
-            }
-    
-            db.all("SELECT nome FROM caracteristica WHERE tipo = 'conhecimento'", (err, conhecimentos) => {
-                if (err) {
-                    conhecimentos = [];
-                }
+router.get('/admin/jogos/adicionar', usuarioAutenticado, async (req, res) => {
+    try {
+        const plataformasResult = await pool.query("SELECT nome FROM caracteristica WHERE tipo = $1", ['plataforma']);
+        const plataformas = plataformasResult.rows || [];
 
-                db.all("SELECT nome FROM caracteristica WHERE tipo = 'idioma'", (err, idiomas) => {
-                    if (err) {
-                        idiomas = [];
-                    }
-                    // renderiza a página com as listas (vazias ou preenchidas)
-                    res.render('admin/adicionar-jogo', { plataformas, categorias, conhecimentos, idiomas });
-                });
-            });
-        });
-    });
-    
-}); 
+        const categoriasResult = await pool.query("SELECT nome FROM caracteristica WHERE tipo = $1", ['categoria']);
+        const categorias = categoriasResult.rows || [];
+
+        const conhecimentosResult = await pool.query("SELECT nome FROM caracteristica WHERE tipo = $1", ['conhecimento']);
+        const conhecimentos = conhecimentosResult.rows || [];
+
+        const idiomasResult = await pool.query("SELECT nome FROM caracteristica WHERE tipo = $1", ['idioma']);
+        const idiomas = idiomasResult.rows || [];
+
+        res.render('admin/edit-add', {jogo: {}, plataformas, categorias, conhecimentos, idiomas, isEdit: false});
+    } catch (err) {
+        res.status(500).send('Erro ao carregar as opções para adicionar o jogo');
+    }
+});
+
 
 //rota para adicionar jogo
-router.post('/admin/jogos/adicionar', upload.fields([{ name: 'imagemCapa', maxCount: 1 }, { name: 'imagens' }]), (req, res) => {
+router.post('/admin/jogos/adicionar', upload.fields([{ name: 'imagemCapa', maxCount: 1 }, { name: 'imagens' }]), async (req, res) => {
     try {
         const { nome, ano, plataforma, categoria, conhecimento, idioma, descricao, linkTitle, linkURL } = req.body;
 
-        //verifica se as plataformas, categorias e conhecimentos são arrays ou strings únicas
+        // Verifica se as plataformas, categorias e conhecimentos são arrays ou strings únicas
         const plataformas = Array.isArray(plataforma) ? plataforma : [plataforma].filter(Boolean);
         const categorias = Array.isArray(categoria) ? categoria : [categoria].filter(Boolean);
         const conhecimentos = Array.isArray(conhecimento) ? conhecimento : [conhecimento].filter(Boolean);
         const idiomas = Array.isArray(idioma) ? idioma : [idioma].filter(Boolean);
 
-        //links externos
+        // Links externos
         const linksExternos = Array.isArray(linkTitle) && Array.isArray(linkURL)
             ? linkTitle.map((titulo, index) => ({ title: titulo, url: linkURL[index] }))
             : linkTitle && linkURL
                 ? [{ title: linkTitle, url: linkURL }]
                 : [];
 
-        //converte o nome do jogo em slug
+        // Converte o nome do jogo em slug
         const slug = slugify(nome, { lower: true });
 
-        //processar imagem de capa
+        // Processar imagem de capa
         let capaBase64 = null;
         if (req.files.imagemCapa) {
-            const capaBuffer = req.files.imagemCapa[0].buffer;  //pega o buffer da imagem da memória
-            capaBase64 = capaBuffer.toString('base64');  //converte para base64
+            const capaBuffer = req.files.imagemCapa[0].buffer;  // Pega o buffer da imagem da memória
+            capaBase64 = capaBuffer.toString('base64');  // Converte para base64
         }
 
-        //processar demais imagens
+        // Processar demais imagens
         const imagensBase64 = req.files.imagens
             ? req.files.imagens.map(file => {
-                const imageBuffer = file.buffer;  //pega o buffer da imagem da memória
-                return imageBuffer.toString('base64');  //converte para base64
+                const imageBuffer = file.buffer;  // Pega o buffer da imagem da memória
+                return imageBuffer.toString('base64');  // Converte para base64
             })
             : [];
 
-        //a imagem de capa fica no índice 0
+        // A imagem de capa fica no índice 0
         imagensBase64.unshift(capaBase64);
 
-        //obter a data e hora atual para data_criacao e data_modificacao
+        // Obter a data e hora atual para data_criacao e data_modificacao
         const dataAtual = new Date().toISOString();
 
-        //salvar as informações no banco de dados
-        db.run(
-            `INSERT INTO jogo (nome, ano, plataforma, categoria, conhecimento, idioma, descricao, links, imagens, slug, data_criacao, data_modificacao) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-            [
-                nome,
-                ano,
-                JSON.stringify(plataformas),
-                JSON.stringify(categorias),
-                JSON.stringify(conhecimentos),
-                JSON.stringify(idiomas),
-                descricao,
-                JSON.stringify(linksExternos),
-                JSON.stringify(imagensBase64),  //agora as imagens incluem a capa no índice 0
-                slug,
-                dataAtual,
-                dataAtual
-            ],
-            (err) => {
-                if (err) {
-                    console.error(err);
-                    return res.status(500).json({ success: false, message: 'Erro ao salvar o jogo no banco de dados' });
-                }
-                res.redirect('/admin'); //redirecionar para a página de administração
-            }
-        );
+        // Formatação JSONB para colunas específicas
+        const plataformasJsonb = JSON.stringify(plataformas);
+        const categoriasJsonb = JSON.stringify(categorias);
+        const conhecimentosJsonb = JSON.stringify(conhecimentos);
+        const idiomasJsonb = JSON.stringify(idiomas);
+        const linksJsonb = JSON.stringify(linksExternos);
+        const imagensJsonb = JSON.stringify(imagensBase64);  // Imagens incluindo a capa no índice 0
+
+        // Salvar as informações no banco de dados
+        const query = `
+            INSERT INTO jogo 
+            (nome, ano, plataforma, categoria, conhecimento, idioma, descricao, links, imagens, slug, data_criacao, data_modificacao) 
+            VALUES 
+            ($1, $2, $3::jsonb, $4::jsonb, $5::jsonb, $6::jsonb, $7, $8::jsonb, $9::jsonb, $10, $11, $12)
+        `;
+        
+        await pool.query(query, [
+            nome,
+            ano,
+            plataformasJsonb,  
+            categoriasJsonb,    
+            conhecimentosJsonb, 
+            idiomasJsonb,       
+            descricao,
+            linksJsonb,         
+            imagensJsonb,       
+            slug,
+            dataAtual,
+            dataAtual
+        ]);
+
+        res.redirect('/admin'); // Redirecionar para a página de administração
     } catch (error) {
-        console.error(error);
+        console.error('Erro ao adicionar o jogo:', error);
         res.status(500).json({ success: false, message: 'Erro ao adicionar o jogo' });
     }
 });
+
 
 module.exports = router;

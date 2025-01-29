@@ -82,24 +82,7 @@
         <% if(jogosRelacionados && jogosRelacionados.length > 0) { %>
             <h2 class="text-2xl font-bold my-4 text-center">Jogos Relacionados</h2>
         <%}%>
-        <div class="grid grid-cols-3 gap-4">
-            <% jogosRelacionados.forEach(function(jogoRelacionado) { %>
-                <div class="game-card max-w-xs bg-white shadow-lg rounded-lg overflow-hidden relative" 
-                        data-images='<%= JSON.stringify(jogoRelacionado.imagens) %>'>
-                    <a href="/jogos/<%= jogoRelacionado.slug %>">
-                        <div class="relative group game-card">
-                            <img class="w-full h-48 object-cover" 
-                                    src="data:image/jpeg;base64,<%= jogoRelacionado.imagens[0] %>" 
-                                    alt="<%= jogoRelacionado.nome %>" 
-                                    id="game-image-<%= jogoRelacionado.slug %>">
-                        </div>
-                        <div class="p-4">
-                            <h2 class="text-lg font-bold"><%= jogoRelacionado.nome %></h2>
-                        </div>
-                    </a>
-                </div>
-            <% }); %>   
-        </div>
+        <%- include('partials/game-card', { jogos: jogosRelacionados }) %>
     </main>
     <%- include('partials/footer') %>
     <script src="/utils.js"></script>

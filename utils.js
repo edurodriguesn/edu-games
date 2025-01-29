@@ -42,3 +42,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+document.getElementById('searchForm').addEventListener('submit', function (event) {
+    event.preventDefault(); // Impede o envio padrão para modificarmos o URL
+    const pesquisa = document.getElementById('pesquisa').value; // Valor do input
+    const page = 1; // Valor dinâmico (se necessário, pode ser alterado com base em outros fatores)
+    const limit = 9; // Valor dinâmico
+    
+    // Cria a URL com os parâmetros
+    const url = `/pesquisa?pesquisa=${encodeURIComponent(pesquisa)}&page=${page}&limit=${limit}`;
+    
+    // Redireciona para a URL
+    window.location.href = url;
+});

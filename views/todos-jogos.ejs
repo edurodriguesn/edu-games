@@ -23,40 +23,9 @@
         <%- include('partials/central') %>
         <section class="p-4 text-center">
             <h1 class="mb-4 text-2xl font-bold">Todos os Jogos</h1>
-            <div class="grid grid-cols-3 gap-4">
-                <% jogos.forEach(function(jogo) { %>
-                    <div class="game-card max-w-xs bg-white shadow-lg rounded-lg overflow-hidden relative" 
-                            data-images='<%= JSON.stringify(jogo.imagens) %>'>
-                        <a href="/jogos/<%= jogo.slug %>">
-                            <div class="relative group game-card">
-                                <img class="w-full h-48 object-cover" 
-                                        src="data:image/jpeg;base64,<%= jogo.imagens[0] %>" 
-                                        alt="<%= jogo.nome %>" 
-                                        id="game-image-<%= jogo.slug %>">
-                            </div>
-                            <div class="p-4">
-                                <h2 class="text-lg font-bold"><%= jogo.nome %></h2>
-                            </div>
-                        </a>
-                    </div>
-                <% }); %>   
-            </div>
-            <div class="mt-6 flex justify-center space-x-4">
-                <% if (page > 1) { %>
-                    <a href="/jogos?page=<%= page - 1 %>&limit=9" 
-                        class="py-2 px-4 bg-blue-700 text-white rounded hover:bg-blue-800">
-                        Página Anterior
-                    </a>
-                <% } %>
-                <% if (page < totalPages) { %>
-                    <a href="/jogos?page=<%= page + 1 %>&limit=9" 
-                        class="py-2 px-4 bg-blue-700 text-white rounded hover:bg-blue-800">
-                        Próxima Página
-                    </a>
-                <% } %>
-            </div>
+            <%- include('partials/game-card', { jogos: jogos }) %>
+            <%- include('partials/paginacao', { rota: "todos-jogos?", page: page, totalPages: totalPages }) %>
         </section>
-        
     </main>
     <%- include('partials/footer') %>
 </body>

@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  # Serviço para rodar o Node.js
+  node:
+    build:
+      context: .           # Caminho para o diretório onde está o Dockerfile
+    container_name: node    # Nome do container do Node.js
+    volumes:
+      - .:/app              # Monta a pasta atual para dentro do container
+    ports:
+      - "3000:3000"         # Mapeia a porta 3000 do container para a 3000 local
+    networks:
+      - backend
+    environment:
+      - DATABASE_URL=${DATABASE_URL}  # Conexão com PostgreSQL utilizando variável de ambiente
+
+  # Serviço para rodar o Nginx
+  nginx:
+    image: nginx:latest     # Usando a imagem oficial do Nginx
+    container_name: nginx   # Nome do container do Nginx
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro  # Monta o arquivo de configuração do Nginx
+      - ./src:/usr/share/nginx/html  # Monta a pasta de arquivos estáticos
+    ports:
+      - "80:80"             # Expondo a porta 80 do Nginx para a 80 local
+    depends_on:
+      - node                # O Nginx depende do serviço Node.js
+    networks:
+      - backend
+
+  # Serviço para rodar o PostgreSQL
+  postgres:
+    image: postgres:13     # Usando a imagem oficial do PostgreSQL
+    container_name: postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}        # Usando a variável de ambiente
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}  # Usando a variável de ambiente
+      POSTGRES_DB: ${POSTGRES_DB}            # Usando a variável de ambiente
+    ports:
+      - "5432:5432"         # Expondo a porta 5432 do PostgreSQL
+    volumes:
+      - postgres_data:/var/lib/postgresql/data  # Persistência de dados
+      - ./db_script.sql:/docker-entrypoint-initdb.d/db_script.sql # Executa o script SQL
+    networks:
+      - backend
+
+# Definindo as redes para os containers
+networks:
+  backend:
+    driver: bridge
+
+# Definindo volumes para persistência de dados
+volumes:
+  postgres_data:

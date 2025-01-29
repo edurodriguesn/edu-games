@@ -58,25 +58,7 @@
 
         <section class="p-4 text-center"> <!-- Galeria de Jogos -->
             <h1 class="mb-4 text-2xl font-bold">Galeria de Jogos</h1>
-            <div class="grid grid-cols-3 gap-4">
-                <% jogos.forEach(function(jogo) { %>
-                    <div class="game-card max-w-xs bg-white shadow-lg rounded-lg overflow-hidden relative" 
-                            data-images='<%= JSON.stringify(jogo.imagens) %>'>
-                        <a href="/jogos/<%= jogo.slug %>">
-                            <div class="relative group game-card">
-                                <img class="w-full h-48 object-cover" 
-                                        src="data:image/jpeg;base64,<%= jogo.imagens[0] %>" 
-                                        alt="<%= jogo.nome %>" 
-                                        id="game-image-<%= jogo.slug %>">
-                            </div>
-                            <div class="p-4">
-                                <h2 class="text-lg font-bold"><%= jogo.nome %></h2>
-                            </div>
-                        </a>
-                    </div>
-                <% }); %>   
-            </div>
-            
+            <%- include('partials/game-card', { jogos: jogos }) %>
             <div>
                 <a href="/todos-jogos?page=1&limit=9" class="my-8 py-2 px-4 text-white font-bold bg-blue-700 hover:bg-blue-800 rounded inline-block">
                     Ver Todos
