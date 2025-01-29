@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GamesHub</title>
+    <link href="/views/styles.css" rel="stylesheet">
+    <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
+</head>
+<body class="bg-gray-100 flex flex-col min-h-screen">
+
+    <%- include('partials/cabecalho') %>
+
+    <main class="flex-grow w-3/4 mx-auto my-8 py-6 px-32 rounded-lg bg-white shadow-lg">
+        <%- include('partials/central') %>
+
+        <section class="p-4 text-center"> 
+            <h1 class="mb-6 text-3xl font-semibold text-gray-800">Oops! <%=mensagem%> (<%=statusCode%>)</h1>
+            <a href="/" class="my-8 py-4 px-4 text-white font-bold bg-green-500 hover:bg-green-700 rounded inline-block">
+                Voltar ao Início
+            </a>
+        </section>
+    </main>
+
+    <%- include('partials/footer') %> 
+
+    <script src="/utils.js"></script>
+</body>
+</html>
