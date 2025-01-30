@@ -7,19 +7,13 @@
     <link href="/views/styles.css" rel="stylesheet">
     <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
 </head>
-<body class="bg-gray-100 flex flex-col min-h-screen"> <!-- Flexbox no body -->
+<body> 
 
     <%- include('partials/cabecalho') %>
-
-    <main class="flex-grow w-3/4 mx-auto my-8 py-6 px-32 rounded-lg bg-white shadow-lg"> <!-- flex-grow para ocupar o restante da tela -->
+    <main>
         <%- include('partials/central') %>
-
-        <section class="p-4 text-center"> 
-            <!-- Título da seção -->
-            <h1 class="mb-6 text-3xl font-semibold text-gray-800">Filtrar por <%= tipoCaracteristica %></h1>
-
-
-            <!-- Grid para os botões -->
+        <section class="mt-4 pt-4 text-center"> 
+            <h1 class="py-4 mb-6 text-3xl font-semibold text-gray-800">Filtrar por <%= tipoCaracteristica %></h1>
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6"> 
                 <% caracteristicas.forEach(function(caracteristica) { %>
                     <div class="game-card max-w-xs bg-white shadow-lg rounded-lg overflow-hidden relative">
@@ -34,7 +28,7 @@
         </section>
     </main>
 
-    <%- include('partials/footer') %> <!-- O footer sempre vai ficar no final da página -->
+    <%- include('partials/footer') %>
 
     <script src="/utils.js"></script>
 </body>

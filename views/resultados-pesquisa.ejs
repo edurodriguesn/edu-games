@@ -7,15 +7,12 @@
     <link href="/views/styles.css" rel="stylesheet">
     <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
 </head>
-<body class="bg-gray-100 flex flex-col min-h-screen">
-
+<body>
     <%- include('partials/cabecalho') %>
-
-    <main class="flex-grow w-3/4 mx-auto my-8 py-6 px-32 rounded-lg bg-white shadow-lg">
-        
+    <main>
         <%- include('partials/central') %>
-        <section class="p-4 text-center">
-            <h1 class="mb-6 text-3xl font-semibold text-gray-800">
+        <section class="mt-4 pt-4 text-center">
+            <h1 class="py-4 mb-6 text-3xl font-semibold text-gray-800">
                 Resultados para "<%= termoPesquisa %>" (<%= total %>)
             </h1>
             
@@ -35,9 +32,7 @@
                 }) %>
         </section>
     </main>
-
     <%- include('partials/footer') %> 
-
     <script src="/utils.js"></script>
 </body>
 </html>

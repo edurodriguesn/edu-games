@@ -19,10 +19,10 @@
 </head>
 <body class="bg-gray-100 flex flex-col min-h-screen">
     <%- include('partials/cabecalho')%>
-    <main class="flex-grow w-[65%] py-6 px-24 my-8 mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
+    <main>
         <%- include('partials/central') %>
-        <section class="p-4 text-center">
-            <h1 class="mb-4 text-2xl font-bold">Todos os Jogos</h1>
+        <section class="pt-4 mt-4 text-center">
+            <h1 class="py-4 text-2xl font-bold">Todos os Jogos</h1>
             <%- include('partials/game-card', { jogos: jogos }) %>
             <%- include('partials/paginacao', { rota: "todos-jogos?", page: page, totalPages: totalPages }) %>
         </section>

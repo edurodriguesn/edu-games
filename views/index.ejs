@@ -17,13 +17,13 @@
         }
     </style>
 </head>
-<body class="bg-gray-100">
+<body>
 
     <%- include('partials/cabecalho') %>
         
-    <main class="w-[65%] py-6 px-24 my-8 mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
+    <main>
         <%- include('partials/central') %>
-        <section class="mb-8">
+        <section class="my-4 py-4">
             <h1 class="text-3xl text-center font-bold">Sobre o Projeto</h1>
             <hr class="my-2">
             <p class="flex justify-between text-gray-700 text-lg">
@@ -56,14 +56,14 @@
             </p>
         </section>
 
-        <section class="p-4 text-center"> <!-- Galeria de Jogos -->
-            <h1 class="mb-4 text-2xl font-bold">Galeria de Jogos</h1>
+        <section class="text-center"> <!-- Galeria de Jogos -->
+            <h1 class="py-4 text-2xl font-bold">Galeria de Jogos</h1>
             <%- include('partials/game-card', { jogos: jogos }) %>
-            <div>
-                <a href="/todos-jogos?page=1&limit=9" class="my-8 py-2 px-4 text-white font-bold bg-blue-700 hover:bg-blue-800 rounded inline-block">
+            <div class="py-4 mt-6">
+                <a href="/todos-jogos?page=1&limit=9" class="py-2 px-4 text-white font-bold bg-blue-700 hover:bg-blue-800 rounded inline-block">
                     Ver Todos
                 </a>
-            </div>            
+            </div>           
         </section>
     </main>
     <%- include('partials/footer') %>
