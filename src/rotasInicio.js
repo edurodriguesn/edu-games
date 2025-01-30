@@ -132,13 +132,10 @@ router.get('/filtrar/:caracteristica/:slug', async (req, res) => {
         const nomeCaracteristica = result.rows[0].nome;
         
         // prepara a consulta com base no tipo de característica e filtra os jogos
-        const query = `
-            SELECT nome, slug, imagens FROM jogo
-            WHERE ${tipoCaracteristica} @> $1::jsonb
-            LIMIT $2 OFFSET $3`; // verifica se o valor está contido no campo jsonb
-        const queryResult = await pool.query(query, [JSON.stringify([nomeCaracteristica]), limit, offset]); // Passa o valor como array
+        const condition = `WHERE ${tipoCaracteristica} @> $1::jsonb`;
+        const queryResult = await pool.query("SELECT nome, slug, imagens FROM jogo " + condition + " LIMIT $2 OFFSET $3", [JSON.stringify([nomeCaracteristica]), limit, offset]); // Passa o valor como array
 
-        const totalResult = await pool.query("SELECT COUNT(*) as total FROM jogo");
+        const totalResult = await pool.query("SELECT COUNT(*) as total FROM jogo "+ condition, [JSON.stringify([nomeCaracteristica])]);
         const total = parseInt(totalResult.rows[0].total, 10);
         const totalPages = Math.ceil(total / limit);
 
@@ -152,7 +149,7 @@ router.get('/filtrar/:caracteristica/:slug', async (req, res) => {
             totalPages
         });
     } catch (err) {
-        return res.status(404).render('erro', { mensagem: 'Erro ao carregar caracerística', statusCode: 404 });
+        return res.status(500).render('erro', { mensagem: 'Erro ao carregar caracerística', statusCode: 500 });
     }
 });
 
@@ -169,6 +166,7 @@ router.get('/pesquisa', async (req, res) => {
             termoPesquisa: '',
             mensagem: 'Por favor, insira um termo de pesquisa.',
             page: 1,
+            total: 0,
             totalPages: 1
         });
     }
@@ -177,18 +175,16 @@ router.get('/pesquisa', async (req, res) => {
     const termoFormatado = `%${termoPesquisa.trim()}%`;
 
     // Consulta para buscar jogos com base no termo de pesquisa
-    const query = `
-        SELECT nome, slug, imagens FROM jogo 
+    const condition = `
         WHERE 
             LOWER(nome) LIKE LOWER($1) OR 
             LOWER(descricao) LIKE LOWER($1) OR 
             categoria @> to_jsonb($1) OR 
             conhecimento @> to_jsonb($1)
-        LIMIT $2 OFFSET $3
         `;
 
     try {
-        const result = await pool.query(query, [termoFormatado, limit, offset]);
+        const result = await pool.query("SELECT nome, slug, imagens FROM jogo " + condition + "LIMIT $2 OFFSET $3", [termoFormatado, limit, offset]);
 
         if (result.rows.length === 0) {
             return res.render('resultados-pesquisa', {
@@ -196,11 +192,12 @@ router.get('/pesquisa', async (req, res) => {
                 termoPesquisa,
                 mensagem: 'Nenhum resultado encontrado para sua pesquisa.',
                 page,
+                total : 0,
                 totalPages: 1
             });
         }
 
-        const totalResult = await pool.query("SELECT COUNT(*) as total FROM jogo");
+        const totalResult = await pool.query("SELECT COUNT(*) as total FROM jogo "+ condition, [termoFormatado]);
         const total = parseInt(totalResult.rows[0].total, 10);
         const totalPages = Math.ceil(total / limit);
 
