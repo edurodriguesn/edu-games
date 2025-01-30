@@ -2,12 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+body {
+  @apply bg-gray-100 flex flex-col min-h-screen
+}
 
-.cabecalho {
-    background: linear-gradient(to right, #1e3a8a, #3b82f6);
-    color: white;
-    padding: 1.5rem;
-    text-align: center;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
-  }
+main {
+  @apply flex-grow w-[65%] py-20 px-20 my-8 mx-auto bg-white shadow-lg rounded-lg overflow-hidden;
+}
   
