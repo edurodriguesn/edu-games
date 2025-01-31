@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= jogo.nome %></title>
     <link href="/views/styles.css" rel="stylesheet">
+    <link href="/src/styles.css" rel="stylesheet">
     <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
 </head>
 <body>
@@ -25,10 +26,10 @@
             <% } %>
             <div class="w-1/2 p-6 text-lg text-gray-700 bg-blue-50 rounded-lg shadow-md h-80">
                 <p class="mb-2"><strong>Ano de Lançamento:</strong> <%= jogo.ano %></p>
-                <p class="mb-2"><strong>Plataforma:</strong> <%= Array.isArray(jogo.plataformas) ? jogo.plataformas.join(', ') : 'N/A' %></p>
-                <p class="mb-2"><strong>Categoria:</strong> <%= Array.isArray(jogo.categorias) ? jogo.categorias.join(', ') : 'N/A' %></p>
-                <p class="mb-2"><strong>Conhecimento:</strong> <%= Array.isArray(jogo.conhecimentos) ? jogo.conhecimentos.join(', ') : 'N/A' %></p>
-                <p class="mb-2"><strong>Idioma:</strong> <%= Array.isArray(jogo.idiomas) ? jogo.idiomas.join(', ') : 'N/A' %></p>
+                <p class="mb-2 limit-text" title="<%= Array.isArray(jogo.plataformas) ? jogo.plataformas.join(', ') : 'N/A' %>"><strong>Plataforma:</strong> <%= Array.isArray(jogo.plataformas) ? jogo.plataformas.join(', ') : 'N/A' %></p>
+                <p class="mb-2 limit-text" title="<%= Array.isArray(jogo.categorias) ? jogo.categorias.join(', ') : 'N/A' %>"><strong>Categoria:</strong> <%= Array.isArray(jogo.categorias) ? jogo.categorias.join(', ') : 'N/A' %></p>
+                <p class="mb-2 limit-text" title="<%= Array.isArray(jogo.conhecimentos) ? jogo.conhecimentos.join(', ') : 'N/A' %>"><strong>Conhecimento:</strong> <%= Array.isArray(jogo.conhecimentos) ? jogo.conhecimentos.join(', ') : 'N/A' %></p>
+                <p class="mb-2 limit-text" title="<%= Array.isArray(jogo.idiomas) ? jogo.idiomas.join(', ') : 'N/A' %>"><strong>Idioma:</strong> <%= Array.isArray(jogo.idiomas) ? jogo.idiomas.join(', ') : 'N/A' %></p>
             </div>
         </div>
         
@@ -93,5 +94,6 @@
     </main>
     <%- include('partials/footer') %>
     <script src="/utils.js"></script>
+    
 </body>
 </html>

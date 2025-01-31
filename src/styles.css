@@ -9,4 +9,12 @@ body {
 main {
   @apply flex-grow w-[65%] py-20 px-20 my-8 mx-auto bg-white shadow-lg rounded-lg overflow-hidden;
 }
-  
+
+.limit-text {
+  display: -webkit-box;
+  -webkit-line-clamp: 2; 
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
