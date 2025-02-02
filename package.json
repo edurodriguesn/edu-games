@@ -4,8 +4,8 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "build:css": "npx tailwindcss -i ./src/styles.css -o ./views/styles.css",
-    "watch:css": "npx tailwindcss -i ./src/styles.css -o ./views/styles.css --watch",
+    "build:css": "npx tailwindcss -i ./src/input.css -o ./dist/tailwind.css --minify",
+    "watch:css": "npx tailwindcss -i ./src/input.css -o ./dist/tailwind.css --watch",
     "start:dev": "nodemon app.js",
     "dev": "concurrently \"npm run watch:css\" \"npm run start:dev\"",
     "start:prod": "pm2 start app.js --name \"gameshub\" && pm2 save",
