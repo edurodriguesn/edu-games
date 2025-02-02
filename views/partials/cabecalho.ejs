@@ -1,45 +1,46 @@
-<header class="bg-gradient-to-r from-blue-800 to-blue-500 text-white p-6 shadow-lg flex justify-center">
-    <!-- Div principal com largura de 65% -->
-    <div class="w-[65%] flex items-center relative">
-        <!-- Div da imagem -->
-        <div class="absolute left-0 hidden xl:block">
+<header class="bg-gradient-to-r from-blue-800 to-blue-500 text-white shadow-lg flex justify-center">
+    <div class="w-full lg:w-[65%] flex flex-col lg:flex-row items-center lg:justify-between py-2">
+        <!-- Imagem (acima em telas menores, à esquerda em telas lg) -->
+        <div class="flex justify-center w-full lg:w-[15%] mb-2 lg:mb-0">
             <a href="/" class="hover:underline">
-                <img src="/images/logo.png" alt="logo" class="w-28">
+                <img src="/images/logo.png" alt="logo" class="w-24 lg:w-28">
             </a>
         </div>
-        <!-- Div do conteúdo centralizado -->
-        <div class="mx-auto flex flex-col items-center space-y-4">
+        <!-- Conteúdo central (Título e Botões) -->
+        <div class="flex flex-col items-center text-center space-y-2 md:space-y-4 w-full lg:w-[65%]">
             <!-- Título -->
-            <h1 class="text-3xl font-semibold text-center">
+            <h1 class="text-3xl font-bold">
                 <a href="/" class="hover:underline">Games Hub</a> - Central de Jogos sobre Computação 
-                <a href="/admin" class="hover:underline">#</a>
             </h1>
-            <!-- Botões de filtro -->
-            <div class="flex space-x-4 justify-center">
-                <div class="py-2 px-4 bg-gray-400 text-gray-900 rounded">
-                    Filtrar por...
+            <div class="flex flex-nowrap justify-center items-center gap-1 md:space-x-4 w-full px-2">
+                <!-- Div "Filtrar" (Escondida no mobile) -->
+                <div class="hidden md:block py-1 px-2 md:py-2 md:px-4 text-md bg-gray-400 text-gray-900 rounded min-w-[100px]">
+                    Filtrar Por...
                 </div>
-                <a href="/filtrar/conhecimento">
-                    <button class="py-2 px-4 text-red-500 font-bold bg-gray-100 hover:bg-gray-300 rounded">
-                        Conhecimento
-                    </button>
-                </a>
-                <a href="/filtrar/plataforma">
-                    <button class="py-2 px-4 text-blue-500  font-bold bg-gray-100 hover:bg-gray-300 rounded">
-                        Plataforma
-                    </button>
-                </a>
-                <a href="/filtrar/categoria">
-                    <button class="py-2 px-4 text-green-500 font-bold bg-gray-100 hover:bg-gray-300 rounded">
-                        Categoria
-                    </button>
-                </a>
-                <a href="/filtrar/idioma">
-                    <button class="py-2 px-4 text-yellow-500 font-bold bg-gray-100 hover:bg-gray-300 rounded">
-                        Idioma
-                    </button>
-                </a>
+                <div class="flex space-x-1 md:space-x-2">
+                    <a href="/filtrar/conhecimento">
+                        <button class="py-1 px-2 md:py-2 md:px-4 text-md text-blue-600 font-bold bg-blue-100 hover:bg-gray-300 rounded">
+                            Conhecimento
+                        </button>
+                    </a>
+                    <a href="/filtrar/plataforma">
+                        <button class="py-1 px-2 md:py-2 md:px-4 text-md text-blue-600 font-bold bg-blue-100 hover:bg-gray-300 rounded">
+                            Plataforma
+                        </button>
+                    </a>
+                    <a href="/filtrar/categoria">
+                        <button class="py-1 px-2 md:py-2 md:px-4 text-md text-blue-600 font-bold bg-blue-100 hover:bg-gray-300 rounded">
+                            Categoria
+                        </button>
+                    </a>
+                    <a href="/filtrar/idioma">
+                        <button class="py-1 px-2 md:py-2 md:px-4 text-md text-blue-600 font-bold bg-blue-100 hover:bg-gray-300 rounded">
+                            Idioma
+                        </button>
+                    </a>
+                </div>
             </div>
         </div>
+        <div class="lg:w-[15%] hidden lg:block"></div>
     </div>
-</header>
+</header>   

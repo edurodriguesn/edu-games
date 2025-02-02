@@ -14,8 +14,8 @@
     <main>
         <%- include('partials/central') %>
 
-        <section class="mt-4 pt-4 text-center"> 
-            <h1 class="py-4 mb-6 text-3xl font-semibold text-gray-800">Jogos filtrados por <%= tipoCaracteristica %> "<%=nomeCaracteristica%>"(<%=total%>) </h1>
+        <section class="mt-2 pt-2 md:pt-4 md:mt-4 text-center"> 
+            <h1 class="py-4 mb-6 text-2xl md:text-3xl font-semibold text-gray-800">Jogos filtrados por <%= tipoCaracteristica %> "<%=nomeCaracteristica%>"(<%=total%>) </h1>
             <% if (jogos.length === 0) { %>
                 <a href="/" class="my-8 py-4 px-4 text-white font-bold bg-green-500 hover:bg-green-700 rounded inline-block">
                     Voltar ao Início

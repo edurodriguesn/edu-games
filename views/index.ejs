@@ -23,7 +23,7 @@
         
     <main>
         <%- include('partials/central') %>
-        <section class="my-4 py-4">
+        <section class="my-2 py-2 md:my-4 md:py-4">
             <h1 class="text-3xl text-center font-bold">Sobre o Projeto</h1>
             <hr class="my-2">
             <p class="flex justify-between text-gray-700 text-lg">
@@ -39,20 +39,6 @@
                 turpis egestas. Pellentesque blandit lacinia lobortis. Nullam posuere nisi at placerat rhoncus. Lorem ipsum 
                 dolor sit amet, consectetur adipiscing elit. Ut quis velit sed nisl rhoncus tristique.
                 Cras vulputate nunc non mollis imperdiet. Nulla accumsan ultrices massa et pretium. Aliquam eu eros justo.
-                Maecenas ut pretium nunc, nec malesuada arcu. Donec condimentum aliquet nulla at facilisis. 
-                Duis sed commodo quam, vel facilisis diam. Praesent sit amet tortor sem.
-                Vestibulum efficitur nec justo sit amet porttitor. Praesent cursus ac enim vel pharetra. Duis et 
-                eleifend turpis. Sed suscipit erat at ipsum ullamcorper, a porta libero aliquet. Nunc elementum dui 
-                nec metus maximus commodo. Duis libero nunc, volutpat ut tempor eu, iaculis eget est. Nunc tristique 
-                nibh non nulla pharetra, nec feugiat nisi rutrum. Nullam mollis dolor ut velit varius, a scelerisque 
-                orci consequat. Duis lacinia justo vel suscipit suscipit. Morbi id nulla ut nulla vehicula ornare.
-                Donec sapien nulla, finibus a elementum sed, posuere mollis massa.
-                Nam mollis auctor auctor. Maecenas purus est, eleifend et euismod nec, ultrices faucibus lectus. 
-                Nunc tincidunt consectetur dolor at euismod. Proin dignissim, sem dignissim pretium auctor, leo lacus 
-                mattis dui, a volutpat nunc ex ac turpis. Vestibulum egestas neque pharetra orci tristique commodo ut suscipit 
-                lacus. Quisque interdum ipsum ante, nec luctus erat suscipit sit amet. Vestibulum ante ipsum primis in 
-                faucibus orci luctus et ultrices posuere cubilia curae; Aenean hendrerit dui lectus. Donec ut dolor rhoncus, 
-                condimentum libero ut, bibendum lorem.
             </p>
         </section>
 
@@ -60,7 +46,7 @@
             <h1 class="py-4 text-2xl font-bold">Galeria de Jogos</h1>
             <%- include('partials/game-card', { jogos: jogos }) %>
             <div class="py-4 mt-6">
-                <a href="/todos-jogos?page=1&limit=9" class="py-2 px-4 text-white font-bold bg-blue-700 hover:bg-blue-800 rounded inline-block">
+                <a href="/todos-jogos?page=1&limit=9" class="py-2 px-4 text-white font-bold bg-blue-500 hover:bg-blue-700 rounded inline-block">
                     Ver Todos
                 </a>
             </div>           
