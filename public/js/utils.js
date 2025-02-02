@@ -24,16 +24,18 @@ function showImageModal(imageSrc) {
     const modal = document.getElementById('imageModal');
     const modalImage = document.getElementById('modalImage');
     modalImage.src = imageSrc;
-    modal.classList.remove('hidden');
+    modal.classList.remove('hidden');  // Remove 'hidden' para mostrar o modal
+    modal.classList.add('flex');       // Adiciona 'flex' para usar o layout flex
 }
 
-// função para fechar o modal
+// Função para fechar o modal
 function closeImageModal() {
     const modal = document.getElementById('imageModal');
-    modal.classList.add('hidden');
+    modal.classList.remove('flex');   // Remove 'flex' para esconder o modal
+    modal.classList.add('hidden');    // Adiciona 'hidden' para esconder o modal
 }
 
-// fechar modal ao clicar fora da imagem
+// Fechar modal ao clicar fora da imagem
 document.addEventListener('DOMContentLoaded', () => {
     const modal = document.getElementById('imageModal');
     modal.addEventListener('click', (event) => {
@@ -42,6 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
 
 document.getElementById('searchForm').addEventListener('submit', function (event) {
     event.preventDefault(); // Impede o envio padrão para modificarmos o URL
