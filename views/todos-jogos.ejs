@@ -24,7 +24,7 @@
         <section class="pt-4 mt-4 text-center">
             <h1 class="py-4 text-2xl font-bold">Todos os Jogos</h1>
             <%- include('partials/game-card', { jogos: jogos }) %>
-            <%- include('partials/paginacao', { rota: "todos-jogos?", page: page, totalPages: totalPages }) %>
+            <%- include('partials/paginacao', { rota: "todos-jogos?", page: page, totalPages: totalPages, limit: limit }) %>
         </section>
     </main>
     <%- include('partials/footer') %>

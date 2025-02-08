@@ -29,7 +29,7 @@ router.get('/todos-jogos', async (req, res) => {
         const total = parseInt(totalResult.rows[0].total, 10);
         const totalPages = Math.ceil(total / limit);
 
-        res.render('todos-jogos', { jogos: jogosResult.rows, total, page, totalPages });
+        res.render('todos-jogos', { jogos: jogosResult.rows, total, page, totalPages, limit });
     } catch (err) {
         return res.status(500).render('erro', { mensagem: 'Erro ao carregar todos os jogos', statusCode: 500 });
     }
@@ -146,7 +146,8 @@ router.get('/filtrar/:caracteristica/:slug', async (req, res) => {
             slugCaracteristica: req.params.slug,
             total,
             page,
-            totalPages
+            totalPages,
+            limit
         });
     } catch (err) {
         return res.status(500).render('erro', { mensagem: 'Erro ao carregar caracerística', statusCode: 500 });
@@ -193,7 +194,8 @@ router.get('/pesquisa', async (req, res) => {
                 mensagem: 'Nenhum resultado encontrado para sua pesquisa.',
                 page,
                 total : 0,
-                totalPages: 1
+                totalPages: 1,
+                limit
             });
         }
 
@@ -208,7 +210,8 @@ router.get('/pesquisa', async (req, res) => {
             mensagem: null,
             total,
             page,
-            totalPages
+            totalPages,
+            limit
         });
     } catch (err) {
         return res.status(500).render('erro', { mensagem: 'Erro ao processar a pesquisa', statusCode: 500 });

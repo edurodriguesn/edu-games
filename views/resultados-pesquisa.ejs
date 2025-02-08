@@ -25,10 +25,8 @@
                 <%- include('partials/game-card', { jogos: jogos }) %>
             <% } %>
             
-            <%- include('partials/paginacao', { 
-                rota: "pesquisa?pesquisa=" + encodeURIComponent(termoPesquisa) + "&", 
-                page: page, 
-                totalPages: totalPages  
+            <%- include('partials/paginacao', { rota: "pesquisa?pesquisa=" + encodeURIComponent(termoPesquisa) + "&", 
+                page: page, totalPages: totalPages, limit: limit
                 }) %>
         </section>
     </main>
