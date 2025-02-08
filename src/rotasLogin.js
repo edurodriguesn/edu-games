@@ -13,7 +13,7 @@ router.post('/login', (req, res) => {
     //verifica as credenciais
     if (username === process.env.DB_USER && password === process.env.DB_PASSWORD) {
         req.session.loggedIn = true;
-        return res.redirect('/admin');
+        return res.redirect(`/admin?page=1&limit=20`)
     } else {
         return res.redirect('/login');
     }
