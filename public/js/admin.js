@@ -35,6 +35,80 @@ function addOptionField(selectId, containerId) {
     newField.appendChild(removeButton);
     container.appendChild(newField);
 }
+function adicionarCaracteristica() {
+    const input = document.getElementById('newCaracteristica');
+    const selectTipo = document.getElementById('tipoCaracteristica');
+
+    const newValue = input.value.trim();
+    const tipo = selectTipo.value;
+
+    if (!newValue) {
+        alert('Digite uma nova característica válida.');
+        return;
+    }
+
+    if (!tipo) {
+        alert('Selecione um tipo de característica.');
+        return;
+    }
+
+    // Envia ao servidor
+    fetch('/add-option', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `tipo=${encodeURIComponent(tipo)}&nome=${encodeURIComponent(newValue)}`
+    })
+    .then(response => response.json()) // Converte a resposta para JSON
+    .then(data => {
+        if (!data.success) {
+            alert(`Erro: ${data.message}`);
+            return;
+        }
+
+        // Adiciona a nova característica na tabela sem recarregar
+        const tabela = document.querySelector("tbody");
+        const novaLinha = document.createElement("tr");
+        novaLinha.classList.add("text-center", "border");
+
+        novaLinha.innerHTML = `
+            <td class="p-2 border">${newValue}</td>
+            <td class="p-2 border capitalize">${tipo}</td>
+            <td class="p-2 border flex justify-center space-x-2">
+                <!-- Editar -->
+                <form action="/admin/caracteristicas/salvar" method="POST" class="flex space-x-2">
+                    <input type="hidden" name="acao" value="editar">
+                    <input type="hidden" name="id" value="${data.id}"> <!-- ID retornado pela API -->
+                    <input type="text" name="nome" value="${newValue}" class="p-1 border rounded w-1/3">
+                    <select name="tipo" class="p-1 border rounded w-1/3">
+                        <option value="plataforma" ${tipo === 'plataforma' ? 'selected' : ''}>Plataforma</option>
+                        <option value="categoria" ${tipo === 'categoria' ? 'selected' : ''}>Categoria</option>
+                        <option value="conhecimento" ${tipo === 'conhecimento' ? 'selected' : ''}>Conhecimento</option>
+                        <option value="idioma" ${tipo === 'idioma' ? 'selected' : ''}>Idioma</option>
+                    </select>
+                    <button type="submit" class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600">Salvar</button>
+                </form>
+
+                <!-- Excluir -->
+                <form action="/admin/caracteristicas/salvar" method="POST">
+                    <input type="hidden" name="acao" value="excluir">
+                    <input type="hidden" name="id" value="${data.id}">
+                    <button type="submit" class="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600">Excluir</button>
+                </form>
+            </td>
+        `;
+
+        tabela.appendChild(novaLinha);
+
+        // Limpa os campos
+        input.value = '';
+        alert('Nova característica adicionada com sucesso.');
+    })
+    .catch(err => {
+        alert('Erro ao adicionar a característica.');
+        console.error(err);
+    });
+}
+
 
 //função do botão de criar nova característica
 function addNewOption(selectId, inputId, containerId) {
@@ -62,7 +136,7 @@ function addNewOption(selectId, inputId, containerId) {
         body: `tipo=${selectId}&nome=${newValue}`
     }).then(response => {
         if (!response.ok) {
-            alert('Erro ao adicionar a nova característica.');
+            alert('Erro ao adicionar a nova característica.'+response,);
             return;
         }
 
