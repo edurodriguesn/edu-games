@@ -8,9 +8,18 @@
     <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
 </head>
 <body class="bg-gray-100">
-    <div class="w-4/5 mx-auto my-6 py-14 px-32 rounded-lg overflow-hidden bg-white shadow-lg">
+    <div class="w-3/5 mx-auto my-6 p-14 rounded-lg overflow-hidden bg-white shadow-lg">
         <h1 class="mb-4 text-2xl font-bold text-center"><a href="/" class="hover:underline">Games Hub</a> - Administração de Jogos</h1>
-    
+        <div class="flex justify-end">
+            <a href="/admin/caracteristicas">
+                <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded flex items-center gap-2">
+                    Características
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+                    </svg>
+                </button>
+            </a>
+        </div>
         <h2 class="mb-4 text-xl font-bold">Jogos Cadastrados</h2>
     
         <!-- Filtro de ordenação -->
@@ -54,6 +63,7 @@
                 <% }) %>
             </tbody>
         </table>
+        <%- include('../partials/paginacao', { rota: "admin?", page: page, totalPages: totalPages, total: total, limit: limit }) %>
     </div>
 </body>
 </html>
