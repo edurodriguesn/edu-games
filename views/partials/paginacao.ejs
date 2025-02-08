@@ -1,5 +1,5 @@
 <div class="py-4 mt-6 flex justify-center space-x-2">
-    <% if (total > 9) { %>
+    <% if (total > limit) { %>
         <% if (page > 1) { %>
             <!-- botão para ir para a primeira página -->
             <a href="/<%= rota %>page=1&limit=9" 
