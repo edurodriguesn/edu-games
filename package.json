@@ -12,7 +12,7 @@
     "stop:prod": "pm2 stop gameshub",
     "restart:prod": "pm2 restart gameshub",
     "logs:prod": "pm2 logs gameshub",
-    "railway": "buid:css && node app.js" 
+    "railway": "build:css && node app.js" 
   },
   "keywords": [],
   "author": "",
