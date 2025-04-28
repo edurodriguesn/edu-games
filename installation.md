@@ -1,4 +1,4 @@
-# Como Executar o GamesHub
+# Como Executar o EduGames
 
 ## Requisitos 
 

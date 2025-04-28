@@ -1,10 +1,10 @@
-# GamesHub
+# EduGames
 
-Bem-vindo ao **GamesHub**, um catálogo de jogos digitais educativos voltados para o ensino da computação. Este projeto acadêmico foi desenvolvido pelo curso de Ciência da Computação da Universidade Federal do Amapá, sob a iniciativa do projeto SERDE.
+Bem-vindo ao **EduGames**, um catálogo de jogos digitais educativos voltados para o ensino da computação. Este projeto acadêmico foi desenvolvido pelo curso de Ciência da Computação da Universidade Federal do Amapá, sob a iniciativa do projeto SERDE.
 
 ## Objetivo
 
-O objetivo do GamesHub é reunir e disponibilizar uma coleção de jogos educativos que auxiliem no aprendizado de conceitos de computação, tornando o processo de ensino mais interativo e envolvente.
+O objetivo do EduGames é reunir e disponibilizar uma coleção de jogos educativos que auxiliem no aprendizado de conceitos de computação, tornando o processo de ensino mais interativo e envolvente.
 
 - **Catálogo de Jogos**: Explore uma variedade de jogos educativos classificados por conhecimentos e categorias.
 
@@ -30,4 +30,4 @@ O objetivo do GamesHub é reunir e disponibilizar uma coleção de jogos educati
 
 ---
 
-Agradecemos por utilizar o GamesHub!
+Agradecemos por utilizar o EduGames!
